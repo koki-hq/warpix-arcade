@@ -4,4 +4,5 @@
 
 | バージョン | 名前 | 中身 |
 | --- | --- | --- |
+| [v0.1.1](v0.1.1.md) | arcade.warpix.app | 独自ドメインに 引っ越し（中身は おなじ） |
 | [v0.1](v0.1.md) | 開店じゅんび | PRESS START・受付の ピクセ・台 4 だい（PIXE INVADERS と COMING SOON 3 だい）・店内 BGM・ホーム画面アプリ |

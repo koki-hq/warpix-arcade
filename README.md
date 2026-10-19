@@ -5,7 +5,7 @@
 WARPIX製作所の 第二弾。ドットと チップチューンの 台で、ぜんぶ ただで あそべます。台は すこしずつ 入荷します。
 となりの へやは リンク集 [WARPIX-LINK](https://link.warpix.app/)（いつものアプリを、ちょっと楽しくひらく入口。）。
 
-- 公開：https://koki-hq.github.io/warpix-arcade/ （arcade.warpix.app に 引っ越し予定）
+- 公開：https://arcade.warpix.app/
 - 仕様メモ：[docs/spec/](docs/spec/README.md)
 
 ## 特徴
