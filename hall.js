@@ -6,6 +6,11 @@ const INVADER_FRAMES = [
   ["..cccc..", ".cccccc.", "wwwwwwww", "wpwwwwpw", ".wwwwww.", ".w....w."],
   ["..cccc..", ".cccccc.", "wwwwwwww", "wwpwwpww", ".wwwwww.", "w......w"],
 ];
+// PIXE RUN の 台：はしる ピクセ（2 コマ）と ゆか
+const RUN_FRAMES = [
+  ["....pp....", "....ww....", "..wwwwww..", ".wwowwoww.", ".wpwwwwpw.", ".wwwwwwww.", "..wwwwww..", "..w....w..", "cccccccccc"],
+  ["....pp....", "....ww....", "..wwwwww..", ".wwowwoww.", ".wpwwwwpw.", ".wwwwwwww.", "..wwwwww..", "...w..w...", "cccccccccc"],
+];
 const QUESTION = [".www.", "w...w", "...w.", "..w..", ".....", "..w.."];
 const STICK = [
   "......oo........",
@@ -89,6 +94,7 @@ const hall = (() => {
     "インベーダーの ボスは 4たい。\nぜんぶに あえたかな？",
     "PIXE QUEST の ぼくは、きみが\nいない あいだも しゅぎょう してるよ。",
     "ボスが「いきを すいこんだ」ら、\nまもると いいよ。",
+    "PIXE RUN の 1-2 には、ひみつの\n土管が あるって うわさ。",
     "ハイスコアを だしたら\nなまえを 3もじ きざめるよ。",
     "となりの へやには リンク集も\nあるよ。したの ボタンから いける。",
     "ここは WARPIX製作所の\nゲームセンター。ゆっくり していってね。",
@@ -123,7 +129,16 @@ const hall = (() => {
         return [`PIXE LV ${s.lv}`, `BOSS ${s.beaten.length}/${quest.bosses().length}`];
       },
     },
-    { id: "soon-2", soon: true },
+    {
+      id: "run",
+      name: "PIXE RUN",
+      open: () => run.open(),
+      frames: RUN_FRAMES,
+      hi: () => {
+        const s = run.save();
+        return [`TIME ${run.fmt(s.best)}`, `CLEAR ${s.clears}`];
+      },
+    },
     { id: "soon-3", soon: true },
   ];
 
@@ -196,6 +211,22 @@ const hall = (() => {
     wins = [];
   }).observe(questEl, { attributes: true, attributeFilter: ["hidden"] });
 
+  // PIXE RUN から もどったら：ぜんぶ クリアした ときだけ ほめる
+  let runClear = null;
+  on("run-start", () => (runClear = null));
+  on("run-clear", (r) => (runClear = r));
+  const runEl = document.getElementById("run");
+  new MutationObserver(() => {
+    if (!runEl.hidden) return;
+    refreshHi();
+    if (!runClear) return;
+    jump();
+    const { mode, frames, best } = runClear;
+    if (mode === "ta") interrupt([`タイムは ${run.fmt(frames)}！`, best ? "じこベスト こうしん！ はやい！" : "つぎは ゴーストに かてるかな？"]);
+    else interrupt(["1-4 まで ぜんぶ クリア！\nおめでとう！", mode === "b" ? "GAME B で クリアなんて、\nうでまえ ほんもの だね。" : "GAME B と TIME も あるよ。"]);
+    runClear = null;
+  }).observe(runEl, { attributes: true, attributeFilter: ["hidden"] });
+
   // ---------- BGM ----------
   let bgmOn = store.get(BGM_KEY, true) !== false;
   function showBgm() {
@@ -247,7 +278,10 @@ const hall = (() => {
   });
 
   // 入荷の おしらせ：まえに 来た ときに なかった 台を ピクセが しょうかい する
-  const NEW = { quest: "あたらしい だい「PIXE QUEST」が\nはいったよ！ ぼくを そだてる ゲーム。" };
+  const NEW = {
+    run: "あたらしい だい「PIXE RUN」が\nはいったよ！ はしって とんで ゴール。",
+    quest: "あたらしい だい「PIXE QUEST」が\nはいったよ！ ぼくを そだてる ゲーム。",
+  };
   function greet() {
     const visits = (Number(store.get(VISITS_KEY, 0)) || 0) + 1;
     store.set(VISITS_KEY, visits);

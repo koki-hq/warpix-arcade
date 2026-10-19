@@ -1,6 +1,6 @@
 // ---------- サービスワーカー：オフラインでも あそべる ように（warpix-link と おなじ しくみ） ----------
 // 公開するたびに VERSION を上げると、新しいファイルを取り直す
-const VERSION = "arcade-v0.4.0";
+const VERSION = "arcade-v0.5.0";
 const FONT_CACHE = "arcade-fonts";
 const FILES = [
   "./",
@@ -11,6 +11,7 @@ const FILES = [
   "invaders.js",
   "quest.js",
   "shop.js",
+  "run.js",
   "hall.js",
   "manifest.webmanifest",
   "icons/icon-192.png",

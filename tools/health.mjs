@@ -102,6 +102,8 @@ async function axe(p, label, setup = "") {
   await p.ev(`invaders.close()`);
   await axe(p, "PIXE QUEST", `document.querySelector('[data-cab="quest"]').click()`);
   await axe(p, "PIXE QUEST たたかい", `document.querySelector('[data-boss="purun"]').click()`);
+  await p.ev(`quest.close()`);
+  await axe(p, "PIXE RUN", `document.querySelector('[data-cab="run"]').click()`);
   await closeAll();
 }
 

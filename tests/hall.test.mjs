@@ -17,7 +17,7 @@ export default {
     t.ok(await p.ev(`document.getElementById("start-screen").hidden && document.body.classList.contains("booted")`), "お店に はいれない");
     t.ok(await p.ev(`sound.playing()`), "BGM が ならない");
     const said = (await p.readIntro()).join("|");
-    t.ok(said.includes("いらっしゃい") && said.includes("2だい"), `はじめての あいさつ: ${said}`);
+    t.ok(said.includes("いらっしゃい") && said.includes("3だい"), `はじめての あいさつ: ${said}`);
     t.eq(await p.ev(`localStorage.getItem("warpix-arcade-visits")`), "1", "来た かい数");
     await p.shot("hall-floor.png");
     t.eq(await p.ev(`document.documentElement.scrollWidth`), 390, "よこに はみでる");
@@ -29,7 +29,7 @@ export default {
     await server.close();
   },
 
-  async "台は 4 だい：PIXE INVADERS・PIXE QUEST と、布を かぶった 2 だい。ピクセを つつくと おしゃべり"(t) {
+  async "台は 4 だい：PIXE INVADERS・PIXE QUEST・PIXE RUN と、布を かぶった 1 だい。ピクセを つつくと おしゃべり"(t) {
     const server = await t.startServer();
     const b = await t.launchBrowser();
     const p = await b.firstPage();
@@ -39,10 +39,10 @@ export default {
     t.eq(cabs, [
       ["invaders", false, "PIXE INVADERS", "A ------B ------"],
       ["quest", false, "PIXE QUEST", "PIXE LV 1BOSS 0/6"],
-      ["soon-2", true, "COMING SOON", "にゅうか まち"],
+      ["run", false, "PIXE RUN", "TIME --:--.--CLEAR 0"],
       ["soon-3", true, "COMING SOON", "にゅうか まち"],
     ], "台");
-    await p.click('[data-cab="soon-2"]');
+    await p.click('[data-cab="soon-3"]');
     await t.sleep(1500);
     t.ok((await p.text()).includes("ないしょ"), "まだ ない 台を おしても ピクセが いわない");
     t.ok(await p.ev(`document.getElementById("game").hidden`), "まだ ない 台で ゲームが はじまった");

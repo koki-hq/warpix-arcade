@@ -672,6 +672,8 @@ body {
 /* GAME A・B（ゲーム&ウオッチの ボタンの ように） */
 .game-modes {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
 }
 
@@ -723,6 +725,62 @@ body {
 
 .gaming {
   overflow: hidden;
+}
+
+/* ---------- PIXE RUN ---------- */
+.run .game-mode {
+  min-width: 96px;
+}
+
+/* スマホの ボタン：左に ◀ ▶、右に JUMP（さわれる 画面の ときだけ。run.js が .touch を つける） */
+.run-pad {
+  display: flex;
+  gap: 12px;
+  width: min(100%, 360px);
+}
+
+.run-pad[hidden] {
+  display: none;
+}
+
+.run-key {
+  width: 64px;
+  height: 64px;
+  border: 0;
+  background: var(--btn);
+  color: var(--fg);
+  font-size: 22px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--fg),
+    0 var(--px) 0 0 var(--fg),
+    calc(var(--px) * -1) 0 0 0 var(--fg),
+    var(--px) 0 0 0 var(--fg);
+}
+
+.run-key.jump {
+  width: 96px;
+  margin-left: auto;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+}
+
+.run-key.on {
+  background: var(--btn-hover);
+}
+
+.run-key.jump.on {
+  background: var(--accent-2);
+  color: var(--bg);
+}
+
+.run:not(.touch) .run-pad {
+  display: none;
 }
 
 /* ---------- PIXE QUEST（ピクセを そだてる 台） ---------- */

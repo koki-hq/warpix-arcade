@@ -23,6 +23,7 @@
   <script src="core.js" defer></script>
   <script src="invaders.js" defer></script>
   <script src="quest.js" defer></script>
+  <script src="run.js" defer></script>
   <script src="shop.js" defer></script>
   <script src="hall.js" defer></script>
 </head>
@@ -85,6 +86,25 @@
     <section class="quest-battle" id="quest-battle" hidden></section>
   </div>
 
+  <div class="game run" id="run" role="dialog" aria-label="PIXE RUN" hidden>
+    <div class="game-head">
+      <span>PIXE RUN <span class="game-head-mode" id="run-head-mode"></span></span>
+      <button class="game-close" id="run-close" type="button">✕ ESC</button>
+    </div>
+    <canvas class="game-canvas" id="run-canvas" tabindex="0" aria-label="ゲームの 画面"></canvas>
+    <div class="game-modes" id="run-modes" hidden>
+      <button class="game-mode" type="button" data-mode="a"><span class="game-mode-name">GAME A</span><span class="game-mode-sub">ふつう</span></button>
+      <button class="game-mode" type="button" data-mode="b"><span class="game-mode-name">GAME B</span><span class="game-mode-sub">はやい</span></button>
+      <button class="game-mode" type="button" data-mode="ta"><span class="game-mode-name">TIME</span><span class="game-mode-sub">タイムを きそう</span></button>
+    </div>
+    <div class="run-pad" id="run-pad">
+      <button class="run-key" type="button" data-key="left" aria-label="ひだりへ">◀</button>
+      <button class="run-key" type="button" data-key="right" aria-label="みぎへ">▶</button>
+      <button class="run-key jump" type="button" data-key="jump" aria-label="ジャンプ">JUMP</button>
+    </div>
+    <p class="game-help">← → で はしる ・ スペースか ↑ で ジャンプ</p>
+  </div>
+
   <dialog class="about" id="about" aria-labelledby="about-title">
     <div class="about-top">
       <h2 id="about-title">このページについて</h2>
@@ -100,6 +120,7 @@
         <li>GAME A は ふつう、GAME B は はやい。ランキングは べつべつ</li>
         <li>3 ウェーブごとに ボス。ボスは 4 たい。あった ボスは タイトルに 顔が でます</li>
         <li>ベスト 5 に はいったら、なまえを 3 もじ きざめます</li>
+        <li>PIXE RUN：はしって とんで、はたに タッチ。1-1 から 1-4 まで。おちても とちゅうの はたから すぐ もういちど。TIME（タイムアタック）では まえの ベストの じぶんが うすく はしります</li>
         <li>PIXE QUEST：ピクセと ボスが じゅんばんに たたかう ゲーム。いそがなくて だいじょうぶ。来なかった あいだも ピクセは しゅぎょう して います。たおした ボスは なかまに なります</li>
       </ul>
       <h3>おみせが そだつ</h3>
@@ -112,6 +133,7 @@
         <li>あった ことの ある ボス</li>
         <li>PIXE QUEST の ピクセ（LV・けいけんち・たおした ボス・なかま・さいごに 来た 時間）</li>
         <li>見た ことの ある 台（あたらしい 台の おしらせに つかう）</li>
+        <li>PIXE RUN の きろく（クリアした かず・ベストタイム・ベストの はしり）</li>
         <li>来た 日の かずと、さいごに 来た 日（おみせの かざりが ふえる）</li>
         <li>来た かい数（ピクセの あいさつに つかう）</li>
         <li>BGM の オン・オフ</li>

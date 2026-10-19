@@ -69,7 +69,7 @@ export default {
     await p.goto(server.url);
     const said = (await p.boot({ readIntro: false }), await p.readIntro()).join("/");
     t.ok(said.includes("PIXE QUEST") && said.includes("はいったよ"), `入荷の おしらせ: ${said}`);
-    t.eq(JSON.parse(await p.ev(`localStorage.getItem("warpix-arcade-seen")`)), ["invaders", "quest"], "見た 台");
+    t.eq(JSON.parse(await p.ev(`localStorage.getItem("warpix-arcade-seen")`)), ["invaders", "quest", "run"], "見た 台");
     await p.click('[data-cab="quest"]');
     await t.sleep(400);
     const diary = await p.ev(`document.querySelector(".quest-diary")?.textContent ?? ""`);
