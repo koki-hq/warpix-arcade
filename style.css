@@ -784,10 +784,25 @@ body {
 }
 
 /* ---------- PIXE QUEST（ピクセを そだてる 台） ---------- */
+/* ホーム画面アプリの iPhone では 時計の 帯や ホームバーの 下まで 画面が ひろがるので、そのぶん あける。
+   見出し（✕ ESC）は スクロールしても 上に のこる */
 .game.quest {
   justify-content: flex-start;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
   background: var(--bg);
   overflow-y: auto;
+}
+
+.quest .game-head {
+  position: sticky;
+  top: calc(-1 * max(16px, env(safe-area-inset-top)));
+  z-index: 1;
+  align-self: stretch;
+  justify-content: center;
+  margin: calc(-1 * max(16px, env(safe-area-inset-top))) -16px 0;
+  padding: max(16px, env(safe-area-inset-top)) 16px 8px;
+  background: var(--bg);
 }
 
 .quest-home,
@@ -818,9 +833,7 @@ body {
 
 .quest-pixe svg,
 .quest-boss-art svg,
-.quest-ally-art svg,
-.quest-foe-art svg,
-.quest-mini svg {
+.quest-ally-art svg {
   display: block;
   width: 100%;
   height: 100%;
@@ -920,8 +933,7 @@ body {
 }
 
 .quest-boss,
-.quest-ally,
-.quest-cmd {
+.quest-ally {
   border: 0;
   background: var(--btn);
   color: var(--fg);
@@ -1001,16 +1013,12 @@ body {
   height: 32px;
 }
 
-.quest-foe {
-  display: flex;
-  flex-direction: column;
+/* たたかい：上に ボスの なまえと HP・ハート、まんなかに リング、下に 3 つの 大きな ボタン */
+.quest-hud {
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 6px;
-}
-
-.quest-foe-art {
-  width: 128px;
-  height: 128px;
+  gap: 4px 12px;
 }
 
 .quest-foe-name {
@@ -1018,56 +1026,104 @@ body {
   font-size: 18px;
 }
 
-.quest-foe .quest-bar {
-  width: 60%;
+.quest-hearts {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--accent);
+  font-size: 20px;
+  letter-spacing: 2px;
 }
 
-.quest-side {
+.quest-ring {
+  display: block;
+  align-self: center;
+  image-rendering: pixelated;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--fg),
+    0 var(--px) 0 0 var(--fg),
+    calc(var(--px) * -1) 0 0 0 var(--fg),
+    var(--px) 0 0 0 var(--fg);
+}
+
+.quest-call {
+  min-height: 1.5em;
+  margin: 0;
+  font-size: 17px;
+  text-align: center;
+}
+
+.quest-pads {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr 1fr;
+  gap: 10px;
+}
+
+.quest-pad {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 2px;
+  min-height: 76px;
+  border: 0;
+  background: var(--btn);
+  color: var(--fg);
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.quest-mini {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
+.quest-pad b {
+  font-size: 22px;
 }
 
-.quest-mini.ally {
-  width: 36px;
-  height: 36px;
+.quest-pad small {
+  font-size: 13px;
 }
 
-.quest-me-hp {
-  flex: 1;
+.quest-pad.punch {
+  background: var(--accent);
+  color: var(--bg);
 }
 
-.quest-me-hp p {
-  margin: 0 0 4px;
+.quest-pad.back {
+  min-height: 64px;
+}
+
+.quest-pad:active {
+  background: var(--btn-hover);
+}
+
+.quest-pad.punch:active {
+  background: var(--accent-2);
+}
+
+.quest-keys {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.quest-how {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: var(--px) solid var(--accent-2);
+  background: var(--bg);
   font-size: 14px;
+  line-height: 1.6;
 }
 
-.shake {
-  animation: shake 0.3s steps(4);
+.quest-how b {
+  display: block;
+  color: var(--accent-2);
 }
 
-@keyframes shake {
-  25% { translate: -4px 0; }
-  75% { translate: 4px 0; }
-}
-
-.down {
-  animation: down 0.8s steps(4) forwards;
-}
-
-@keyframes down {
-  to { opacity: 0.25; translate: 0 8px; }
-}
-
-/* RPG の メッセージ（さいごの 3 ぎょう） */
+/* けっか */
 .quest-log {
-  min-height: calc(3 * 1.6em + 24px);
   padding: 12px 14px;
   background: var(--bg);
   box-shadow:
@@ -1077,55 +1133,25 @@ body {
     var(--px) 0 0 0 var(--fg);
   font-size: 16px;
   line-height: 1.6;
-  cursor: pointer;
 }
 
 .quest-log p {
   margin: 0;
 }
 
-.quest-cmds {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.quest-cmd {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-height: 64px;
-  padding: 10px 8px;
-}
-
-.quest-cmd b {
-  font-size: 18px;
-}
-
-.quest-cmd small {
-  color: var(--fg);
-  font-size: 12px;
-}
-
-.quest-cmd.back {
-  grid-column: 1 / -1;
-}
-
-.quest-cmd:disabled {
-  background: var(--bg);
-  cursor: default;
-}
-
 .quest-boss:not(:disabled):hover,
 .quest-boss:focus-visible,
 .quest-ally:hover,
 .quest-ally:focus-visible,
-.quest-cmd:not(:disabled):hover,
-.quest-cmd:focus-visible {
-  background: var(--btn-hover);
+.quest-pad:hover,
+.quest-pad:focus-visible {
   outline: var(--px) solid var(--accent-2);
   outline-offset: 3px;
+}
+
+.quest-boss:not(:disabled):hover,
+.quest-ally:hover {
+  background: var(--btn-hover);
 }
 
 /* ---------- このページについて ---------- */

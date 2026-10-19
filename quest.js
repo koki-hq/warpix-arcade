@@ -1,8 +1,10 @@
-// ---------- 2 だいめ「PIXE QUEST」（v0.3） ----------
-// ピクセを そだてる 台。じゅんばんに たたかう ので、はやい 指は いらない（50 代にも 子どもにも）。
-// - 来なかった あいだも ピクセは しゅぎょう して いて、来ると すこし つよい（たまごっちの 逆で、こないことを せめない）
-// - まけても けいけんちは のこる。たおした ボスは なかまに なって、1 たい つれて いける
-// - ボスは 「つぎに なにを するか」を みせて くる（いきを すいこんだ → まもる、など）。よんで こたえる たのしさ
+// ---------- 2 だいめ「PIXE QUEST」 ----------
+// v0.3：ピクセを そだてる 台（じゅんばんに たたかう）。v0.6：たたかいを「見て、よけて、なぐる」に つくりなおした（ファミコンの パンチアウトふう）
+// - ボスは こうげきの まえに かならず クセを みせる（かたむく・「！」・左右から きこえる 音）。よけると すきが できて、パンチが はいる
+// - ボスごとに じぶんの 曲が あって、こうげきは その 拍に のって くる。耳でも よめる
+// - ボタンは 3 つだけ（◀ よける・パンチ・よける ▶）。はやい 指より「見て 1 かい おす」
+// - 来なかった あいだも ピクセは しゅぎょう（LV が あがると ハートと パンチが つよく なる）。うまく なれば LV 1 でも かてる
+// - たおした ボスは なかまに なって、セコンドに 1 たい ついて くれる
 const quest = (() => {
   const KEY = "warpix-arcade-quest";
   const overlay = document.getElementById("quest");
@@ -11,61 +13,74 @@ const quest = (() => {
   const closeBtn = document.getElementById("quest-close");
 
   // ---------- ボス（16x16） ----------
-  // pattern：ボスの こうどう。じゅんばんに くりかえす。say だけの ものは「つぎに なにか くる」の あいず
+  // bout：bpm（曲の はやさ）、hp、tell（クセの なが さ、拍）、rest（つぎまでの 拍）、stun（よけた あとの すき、拍）
+  // moves：L 左から・R 右から・C まんなかに ふりおろす・LR / RL つづけて 2 かい・F 左と みせて 右（G は その ぎゃく）
   const BOSSES = [
     {
       id: "purun",
       name: "プルン",
-      hp: 20, atk: 4, def: 0, exp: 10,
+      exp: 10,
       art: ["................", "................", "................", "................", "......cccc......", "....cccccccc....", "...ccwwccccccc..", "..ccwwcccccccc..", "..cccccccccccc..", ".ccccoccccocccc.", ".ccccoccccocccc.", ".cpcccccccccpcc.", ".ccccccoocccccc.", "cccccccccccccccc", ".cccccccccccccc.", "................"],
-      pattern: ["hit", "hit", "wobble"],
-      ally: { say: "プルンが ぷるぷる いやして くれた。", heal: 3 },
-      allyNote: "まいターン HP を 3 かいふく",
+      bout: { bpm: 96, hp: 12, tell: 2, rest: 2, stun: 2, moves: ["L", "R", "L", "R", "C"] },
+      tellSay: "ぷるぷる…",
+      song: { bpm: 96, lead: [72, null, 76, null, 79, 76, 72, null, 74, null, 77, null, 81, 77, 74, null, 76, null, 79, null, 84, 79, 76, null, 79, 77, 76, 74, 72, null, null, null], bass: [48, 50, 52, 43] },
+      ally: { save: 1 },
+      allyNote: "1かいだけ ハート 0 で ふみとどまる",
     },
     {
       id: "obake",
       name: "オバケ",
-      hp: 36, atk: 6, def: 1, exp: 20,
+      exp: 20,
       art: ["................", "......wwww......", "....wwwwwwww....", "...wwwwwwwwww...", "..wwwwwwwwwwww..", "..wwoowwwwoowww.", "..wwoowwwwoowww.", "..wwwwwwwwwwwww.", ".wpwwwwoowwwwpw.", ".wwwwwwwwwwwwww.", "wwwwwwwwwwwwwww.", ".wwwwwwwwwwwwwww", "..wwwwwwwwwwwww.", "..wwwwwwwwwwwww.", "..ww.www.www.ww.", "...w..w...w...w."],
-      pattern: ["hit", "fade", "hit", "hit"],
-      ally: { say: "オバケが おどかした！", scare: 0.25 },
-      allyNote: "ときどき あいてを ひるませる",
+      bout: { bpm: 104, hp: 16, tell: 2, rest: 2, stun: 2, moves: ["L", "C", "R", "F", "R", "G"], fade: true },
+      tellSay: "すうっと うすく なった…",
+      song: { bpm: 104, lead: [69, null, 72, null, 76, null, 75, null, 74, null, 72, null, 71, null, 68, null, 69, 72, 76, 81, 80, null, 76, null, 77, 76, 74, 72, 71, null, null, null], bass: [45, 41, 40, 45] },
+      ally: { slow: 0.5 },
+      allyNote: "ボスの クセが すこし ながく なる",
     },
     {
       id: "golem",
       name: "ゴーレム",
-      hp: 55, atk: 8, def: 6, exp: 35,
+      exp: 35,
       art: ["................", "....vvvvvvvv....", "...vvvvvvvvvv...", "...vvyyvvyyvv...", "...vvvvvvvvvv...", "...vvvooooovv...", "....vvvvvvvv....", ".vvvvvvvvvvvvvv.", "vvvvvvvvvvvvvvvv", "vvv.vvvvvvvv.vvv", "vvv.vvvvvvvv.vvv", "vv..vvvvvvvv..vv", "....vvvvvvvv....", "....vvv..vvv....", "...vvvv..vvvv...", "................"],
-      pattern: ["hit", "raise", "smash"],
-      ally: { def: 3 },
-      allyNote: "まもりが 3 あがる",
+      bout: { bpm: 84, hp: 22, tell: 3, rest: 1, stun: 3, moves: ["C", "L", "C", "R", "C", "LR"] },
+      tellSay: "うでを ふりあげた！",
+      song: { bpm: 84, kick: true, lead: [62, null, null, 62, 65, null, 62, null, 60, null, null, 60, 64, null, 60, null, 62, null, 65, null, 69, null, 67, 65, 64, null, 62, null, 61, null, null, null], bass: [38, 36, 34, 33] },
+      ally: { guard: 1 },
+      allyNote: "さいしょの 1 ぱつを うけとめる",
     },
     {
       id: "hachi",
       name: "ハチ",
-      hp: 60, atk: 7, def: 2, exp: 50,
+      exp: 50,
       art: ["................", "....ww....ww....", "...wwww..wwww...", "...wwww..wwww...", "....ww....ww....", ".....yyyyyy.....", "....yyyyyyyy....", "...yoyyyyyyoy...", "...pyyyyyyyyp...", "...oooooooooo...", "...yyyyyyyyyy...", "...oooooooooo...", "....yyyyyyyy....", ".....yyyyyy.....", ".......oo.......", "................"],
-      pattern: ["double", "hit", "buzz", "triple"],
-      ally: { say: "ハチが ちくっと さした！", dmg: 3 },
-      allyNote: "まいターン 3 の ダメージ",
+      bout: { bpm: 132, hp: 22, tell: 2, rest: 2, stun: 2, moves: ["LR", "L", "RL", "R", "LR", "C"] },
+      tellSay: "ブンブン…",
+      song: { bpm: 132, kick: true, lead: [76, 79, 76, 79, 81, 79, 76, 74, 76, 79, 76, 79, 83, 81, 79, 76, 74, 77, 74, 77, 79, 77, 74, 72, 71, 74, 71, 74, 76, null, 76, null], bass: [40, 40, 36, 38] },
+      ally: { power: 1 },
+      allyNote: "パンチが 1 つよい",
     },
     {
       id: "doragon",
       name: "ドラゴン",
-      hp: 90, atk: 10, def: 4, exp: 80,
+      exp: 80,
       art: ["................", "..y..........y..", "..yy........yy..", "...pppppppppp...", "..pppppppppppp..", "..ppwoppppwopp..", "..pppppppppppp..", "..pppppopoppppp.", "...pppppppppp...", "..pppwwwwwwppp..", ".ppppwwwwwwpppp.", "pp.pwwwwwwwwp.pp", "...pwwwwwwwwp...", "...pppppppppp...", "...pp......pp...", "................"],
-      pattern: ["hit", "inhale", "breath", "hit", "hit"],
-      ally: { say: "ドラゴンが ひを ふいた！", dmg: 6, every: 2 },
-      allyNote: "2 ターンごとに 6 の ダメージ",
+      bout: { bpm: 112, hp: 28, tell: 2, rest: 2, stun: 2, moves: ["C", "L", "R", "F", "LR", "C", "G"] },
+      tellSay: "おおきく いきを すいこんだ…",
+      song: { bpm: 112, kick: true, lead: [65, null, 68, null, 72, null, 70, 68, 67, null, 63, null, 67, null, null, null, 65, 68, 72, 77, 75, null, 72, 70, 68, 67, 65, 63, 65, null, null, null], bass: [41, 39, 37, 36] },
+      ally: { stun: 1 },
+      allyNote: "よけた あとの すきが ながく なる",
     },
     {
       id: "maou",
       name: "まおう",
-      hp: 130, atk: 12, def: 6, exp: 150,
+      exp: 150,
       art: ["................", "....y.y..y.y....", "....yyyyyyyy....", "....yyyyyyyy....", "...wwwwwwwwww...", "..wwwwwwwwwwww..", "..wwoowwwwooww..", "..wwoowwwwooww..", "..wpwwwoowwwpw..", "...wwwwwwwwww...", ".vvvvvvvvvvvvvv.", "vvvvvvvvvvvvvvvv", "vvvvvyyyyyyvvvvv", "vvvvvvvvvvvvvvvv", ".vvvvvvvvvvvvvv.", "..vv........vv.."],
-      pattern: ["hit", "fade", "hit", "raise", "smash", "inhale", "breath"],
-      ally: { atk: 5 },
-      allyNote: "ちからが 5 あがる",
+      bout: { bpm: 140, hp: 36, tell: 2, rest: 1, stun: 2, moves: ["L", "F", "R", "LR", "C", "G", "RL", "C"] },
+      tellSay: "ふふふ…",
+      song: { bpm: 140, kick: true, lead: [72, 75, 79, 84, 83, 79, 75, 72, 71, 74, 77, 83, 81, 77, 74, 71, 72, 75, 79, 84, 86, 84, 83, 79, 80, 79, 77, 75, 74, null, 71, null], bass: [36, 35, 32, 31] },
+      ally: { hearts: 2 },
+      allyNote: "ハートが 2 ふえる",
     },
   ];
   const bossById = (id) => BOSSES.find((k) => k.id === id);
@@ -88,10 +103,11 @@ const quest = (() => {
   let save = load();
   const persist = () => store.set(KEY, save);
   const need = (lv) => lv * 10;
+  // LV で ふえる：ハート 3＋（LV−1）/2（8 まで）、パンチ 1＋（LV−1）/3
   function stats() {
     const lv = save.lv;
     const ally = bossById(save.ally)?.ally ?? {};
-    return { max: 20 + lv * 6, atk: 4 + lv * 2 + (ally.atk ?? 0), def: lv - 1 + (ally.def ?? 0) };
+    return { hearts: Math.min(8, 3 + Math.floor((lv - 1) / 2)) + (ally.hearts ?? 0), power: 1 + Math.floor((lv - 1) / 3) + (ally.power ?? 0) };
   }
   function gainExp(n) {
     save.exp += n;
@@ -108,7 +124,7 @@ const quest = (() => {
   // ---------- 来なかった あいだの しゅぎょう ----------
   // 1 じかんごとに けいけんち 3（1 日ぶん 72 まで）
   const HOUR = 3600 * 1000;
-  const TRAINING = ["うでたて ふせを 100かい！", "やまみちを ランニング！", "たきに うたれて しゅぎょう！", "ほんを よんで おべんきょう！", "すぶりを 1000かい！", "ゆっくり ねて たいりょく かいふく！"];
+  const TRAINING = ["うでたて ふせを 100かい！", "やまみちを ランニング！", "たきに うたれて しゅぎょう！", "サンドバッグを 1000ぱつ！", "なわとびを 500かい！", "ゆっくり ねて たいりょく かいふく！"];
   function trainWhileAway(now = Date.now()) {
     const away = save.last ? now - save.last : 0;
     save.last = now;
@@ -130,12 +146,13 @@ const quest = (() => {
         <span class="quest-pixe${all ? " crown" : ""}">${pixelSvg(NPC.idle)}</span>
         <div class="quest-stats">
           <p class="quest-lv">ピクセ <b>LV ${save.lv}</b></p>
-          <p>HP ${s.max} ・ ちから ${s.atk} ・ まもり ${s.def}</p>
+          <p>ハート ${s.hearts} ・ パンチ ${s.power}</p>
           <p class="quest-exp"><span class="quest-bar"><span style="width:${Math.round((100 * save.exp) / need(save.lv))}%"></span></span>つぎの LV まで ${need(save.lv) - save.exp}</p>
         </div>
       </div>
       ${diary ? `<p class="quest-diary"><b>ピクセの しゅぎょう にっき</b>${diary.hours}じかん、${diary.what}<br>けいけんち ＋${diary.exp}${diary.ups ? `　LV が ${diary.ups} あがった！` : ""}</p>` : ""}
       ${all ? `<p class="quest-diary"><b>ぜんぶの ボスを たおした！</b>また なんどでも たたかえるよ。</p>` : ""}
+      <p class="quest-how"><b>あそびかた</b>ボスが かたむいたら、はんたいに よける。よけたら すきが できるので パンチ！</p>
       <h2 class="quest-label">ボス</h2>
       <div class="quest-bosses">
         ${BOSSES.map((k) => {
@@ -149,7 +166,7 @@ const quest = (() => {
         }).join("")}
       </div>
       ${save.beaten.length ? `
-      <h2 class="quest-label">なかま <small>1たい つれて いける</small></h2>
+      <h2 class="quest-label">セコンド <small>なかまを 1たい つれて いける</small></h2>
       <div class="quest-allies">
         ${save.beaten.map((id) => {
           const k = bossById(id);
@@ -173,155 +190,332 @@ const quest = (() => {
     }
   }
 
-  // ---------- たたかい ----------
-  let b = null; // いまの たたかい
-  let speed = 650; // メッセージ 1 ぎょうの ま（テストでは みじかく する）
-  let skip = false;
+  // ---------- たたかい（160x120 の キャンバス） ----------
+  const W = 160;
+  const H = 120;
+  const LANE = { L: 24, C: 64, R: 104 }; // ピクセの いる ところ（x）
+  const PIXE_Y = 84;
+  const DODGE_MS = 420; // よけて いる じかん
+  const PUNCH_MS = 170; // パンチの あいだ
+  const GLOVE = ["..pppp..", ".pppppp.", "pppppppp", "pppppppp", "pwpppppp", ".pppppp.", "..wwww..", "..wwww.."];
 
-  const CMDS = [
-    { id: "attack", label: "こうげき", note: "ちからで たたく" },
-    { id: "charge", label: "ためる", note: "つぎの こうげき 2.5ばい" },
-    { id: "guard", label: "まもる", note: "ダメージ 4ぶんの1" },
-    { id: "herb", label: "やくそう", note: "HP はんぶん かいふく" },
-  ];
+  let b = null; // いまの たたかい
+  let raf = 0;
+  let colors = {};
+  let sprites = {};
+  let clock = () => performance.now(); // テストでは すすめかたを かえられる
+
+  function buildSprites(boss) {
+    const css = getComputedStyle(document.body);
+    const v = (name) => css.getPropertyValue(name).trim();
+    colors = { o: v("--shadow"), w: v("--fg"), p: v("--accent"), c: v("--accent-2"), y: v("--gold"), v: v("--muted"), b: v("--btn"), bg: v("--bg") };
+    const make = (rows) => {
+      const cv = document.createElement("canvas");
+      cv.width = rows[0].length;
+      cv.height = rows.length;
+      const cx = cv.getContext("2d");
+      rows.forEach((row, y) =>
+        [...row].forEach((ch, x) => {
+          if (!colors[ch] || ch === "bg") return;
+          cx.fillStyle = colors[ch];
+          cx.fillRect(x, y, 1, 1);
+        })
+      );
+      return cv;
+    };
+    sprites = { boss: make(boss.art), pixe: make(NPC.idle), blink: make(NPC.blink), glove: make(GLOVE) };
+  }
 
   function fight(id) {
     const boss = bossById(id);
     const s = stats();
-    b = { boss, hp: boss.hp, step: 0, turn: 0, me: { hp: s.max, ...s }, herbs: 3, charged: false, faded: false, busy: false, over: false, log: [] };
-    sound.sfx.coin();
+    const ally = bossById(save.ally)?.ally ?? {};
+    const bt = boss.bout;
+    b = {
+      boss,
+      bt,
+      ally,
+      beat: 60000 / bt.bpm,
+      t0: clock() + 60,
+      hp: bt.hp,
+      hearts: s.hearts,
+      maxHearts: s.hearts,
+      power: s.power,
+      guard: ally.guard ?? 0,
+      saveLeft: ally.save ?? 0,
+      tell: bt.tell + (ally.slow ?? 0),
+      stunLen: bt.stun + (ally.stun ?? 0),
+      state: "intro",
+      until: 4, // 拍
+      mi: 0,
+      lands: [],
+      show: null,
+      dodge: null, // { dir, until }
+      punch: 0,
+      flash: 0,
+      hurt: 0,
+      over: false,
+      log: [],
+      stats: { dodged: 0, hit: 0, punches: 0 },
+    };
+    buildSprites(boss);
     battleEl.innerHTML = `
-      <div class="quest-foe">
-        <span class="quest-foe-art" id="quest-foe-art">${pixelSvg(boss.art)}</span>
+      <div class="quest-hud">
         <p class="quest-foe-name">${boss.name}</p>
         <span class="quest-bar foe"><span id="quest-foe-hp"></span></span>
+        <p class="quest-hearts" id="quest-hearts" aria-label="ピクセの ハート"></p>
       </div>
-      <div class="quest-side">
-        <span class="quest-mini" id="quest-me-art">${pixelSvg(NPC.idle)}</span>
-        <div class="quest-me-hp"><p>ピクセ LV ${save.lv}　<span id="quest-me-num"></span></p><span class="quest-bar"><span id="quest-me-hp"></span></span></div>
-        ${save.ally ? `<span class="quest-mini ally" title="なかま">${pixelSvg(bossById(save.ally).art)}</span>` : ""}
+      <canvas class="quest-ring" id="quest-ring" width="${W}" height="${H}" aria-label="たたかいの 画面"></canvas>
+      <p class="quest-call" id="quest-call" aria-live="polite"></p>
+      <div class="quest-pads" id="quest-cmds">
+        <button class="quest-pad" type="button" data-cmd="left"><b>◀</b><small>よける</small></button>
+        <button class="quest-pad punch" type="button" data-cmd="punch"><b>パンチ</b></button>
+        <button class="quest-pad" type="button" data-cmd="right"><b>▶</b><small>よける</small></button>
       </div>
-      <div class="quest-log" id="quest-log" aria-live="polite"></div>
-      <div class="quest-cmds" id="quest-cmds">
-        ${CMDS.map((c) => `<button class="quest-cmd" type="button" data-cmd="${c.id}"><b>${c.label}</b><small>${c.note}</small></button>`).join("")}
-      </div>
+      <p class="quest-keys">← → で よける ・ スペースで パンチ</p>
     `;
     homeEl.hidden = true;
     battleEl.hidden = false;
-    battleEl.querySelector("#quest-log").addEventListener("click", () => (skip = true));
-    for (const btn of battleEl.querySelectorAll("[data-cmd]")) btn.addEventListener("click", () => turn(btn.dataset.cmd));
-    refresh();
-    say([`${boss.name}が あらわれた！`, ...(save.ally ? [`なかまの ${bossById(save.ally).name}も いっしょだ。`] : [])]).then(() => battleEl.querySelector("[data-cmd]")?.focus());
-  }
-
-  function refresh() {
-    const $ = (id) => battleEl.querySelector(`#${id}`);
-    $("quest-foe-hp").style.width = `${Math.max(0, (100 * b.hp) / b.boss.hp)}%`;
-    $("quest-me-hp").style.width = `${Math.max(0, (100 * b.me.hp) / b.me.max)}%`;
-    $("quest-me-hp").classList.toggle("low", b.me.hp <= b.me.max / 4);
-    $("quest-me-num").textContent = `HP ${Math.max(0, b.me.hp)}/${b.me.max}`;
-    const herb = battleEl.querySelector('[data-cmd="herb"] b');
-    herb.textContent = `やくそう ×${b.herbs}`;
-    for (const btn of battleEl.querySelectorAll("[data-cmd]")) btn.disabled = b.busy || b.over || (btn.dataset.cmd === "herb" && !b.herbs);
-  }
-
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-  // 1 ぎょうずつ だす（タップで とばせる）。のこすのは さいごの 3 ぎょう
-  async function say(lines) {
-    const logEl = battleEl.querySelector("#quest-log");
-    for (const line of lines) {
-      if (typeof line === "function") {
-        line();
-        refresh();
-        continue;
-      }
-      b.log.push(line);
-      logEl.replaceChildren(...b.log.slice(-3).map((t) => Object.assign(document.createElement("p"), { textContent: t })));
-      sound.sfx.text();
-      if (!skip) await wait(speed);
+    for (const btn of battleEl.querySelectorAll("[data-cmd]")) {
+      btn.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        act(btn.dataset.cmd);
+      });
+      // キーボードの Enter・スペース（ボタンに フォーカスが ある とき）
+      btn.addEventListener("click", (e) => e.detail === 0 && act(btn.dataset.cmd));
     }
-    skip = false;
+    fitRing();
+    hud();
+    call(`${boss.name}が あらわれた！`);
+    sound.sfx.coin();
+    sound.songPlay(boss.song);
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(frame);
+    battleEl.querySelector('[data-cmd="punch"]').focus();
+    emit("quest-fight", { boss: id });
   }
 
-  function shake(id) {
-    const el = battleEl.querySelector(`#${id}`);
-    el.classList.remove("shake");
-    void el.offsetWidth;
-    el.classList.add("shake");
+  function fitRing() {
+    const ring = battleEl.querySelector("#quest-ring");
+    if (!ring) return;
+    const scale = Math.max(1, Math.floor(Math.min((Math.min(innerWidth, 480) - 32) / W, (innerHeight - 330) / H)));
+    ring.style.width = `${W * scale}px`;
+    ring.style.height = `${H * scale}px`;
   }
 
-  const rnd = (n) => Math.floor(Math.random() * (n + 1));
+  function hud() {
+    battleEl.querySelector("#quest-foe-hp").style.width = `${Math.max(0, (100 * b.hp) / b.bt.hp)}%`;
+    battleEl.querySelector("#quest-hearts").textContent = "♥".repeat(Math.max(0, b.hearts)) + "♡".repeat(Math.max(0, b.maxHearts - b.hearts));
+  }
+  function call(text) {
+    b.log.push(text);
+    battleEl.querySelector("#quest-call").textContent = text;
+  }
 
-  async function turn(cmd) {
-    if (!b || b.busy || b.over) return;
-    b.busy = true;
-    b.turn++;
-    refresh();
-    const lines = [];
-    const foe = b.boss;
-    // ピクセの ばん
-    if (cmd === "attack") {
-      if (b.faded && !b.charged) {
-        lines.push("ピクセの こうげき！", `しかし ${foe.name}を すりぬけた！`);
-      } else {
-        const dmg = Math.max(1, Math.round(b.me.atk * (b.charged ? 2.5 : 1)) - foe.def + rnd(2));
-        lines.push(b.charged ? "ピクセの ためた いちげき！" : "ピクセの こうげき！", () => { b.hp -= dmg; shake("quest-foe-art"); sound.sfx.hit(); }, `${foe.name}に ${dmg}の ダメージ！`);
+  const beatNow = () => (clock() - b.t0) / b.beat;
+  const sidePan = { L: -0.8, R: 0.8, C: 0 };
+
+  // ボスの つぎの わざ。lands：あたる 拍と ほうこう、show：みせる ほうこう（F・G は とちゅうで かわる）
+  function startMove(now) {
+    const m = b.bt.moves[b.mi++ % b.bt.moves.length];
+    const at = now + b.tell;
+    const lands =
+      m === "LR" ? [{ side: "L", at }, { side: "R", at: at + 1 }] :
+      m === "RL" ? [{ side: "R", at }, { side: "L", at: at + 1 }] :
+      m === "F" ? [{ side: "R", at }] :
+      m === "G" ? [{ side: "L", at }] :
+      [{ side: m, at }];
+    b.lands = lands;
+    b.feint = m === "F" ? { from: "L", switch: at - 0.75 } : m === "G" ? { from: "R", switch: at - 0.75 } : null;
+    b.show = b.feint ? b.feint.from : lands[0].side;
+    b.state = "tell";
+    b.tellFrom = now;
+    sound.cue(b.show === "C" ? 330 : 440, sidePan[b.show]);
+    call(b.boss.tellSay);
+  }
+
+  function pixeLane(ms) {
+    return b.dodge && ms < b.dodge.until ? b.dodge.dir : "C";
+  }
+  // L から くる こうげきは 左と まんなか、R は 右と まんなか、C は まんなかだけに あたる
+  const hits = (side, lane) => (side === "C" ? lane === "C" : lane === side || lane === "C");
+
+  function update() {
+    if (!b || b.over) return;
+    const ms = clock();
+    const now = beatNow();
+    if (b.state === "intro") {
+      if (now >= b.until) {
+        call("ファイト！");
+        b.state = "rest";
+        b.until = now + 1;
       }
-      b.charged = false;
-    } else if (cmd === "charge") {
-      lines.push(b.charged ? "ピクセは もう ちからを ためて いる。" : "ピクセは ちからを ためた！");
-      b.charged = true;
-    } else if (cmd === "guard") {
-      lines.push("ピクセは みを まもって いる。");
-    } else if (cmd === "herb") {
-      const heal = Math.min(b.me.max - b.me.hp, Math.ceil(b.me.max / 2));
-      b.herbs--;
-      lines.push("ピクセは やくそうを たべた。", () => { b.me.hp += heal; sound.sfx.powerup(); }, `HP が ${heal} かいふく した。`);
+      return;
     }
-    b.faded = false;
-    // なかまの ばん
-    const ally = bossById(save.ally)?.ally;
-    if (ally?.heal) lines.push(() => (b.me.hp = Math.min(b.me.max, b.me.hp + ally.heal)), `${ally.say} HP ＋${ally.heal}`);
-    if (ally?.dmg && b.turn % (ally.every ?? 1) === 0) lines.push(() => { b.hp -= ally.dmg; shake("quest-foe-art"); }, `${ally.say} ${ally.dmg}の ダメージ！`);
-    await say(lines);
-    if (b.hp <= 0) return win();
+    if (b.state === "rest" && now >= b.until) startMove(now);
+    if (b.state === "tell") {
+      if (b.feint && now >= b.feint.switch && b.show !== b.lands[0].side) {
+        b.show = b.lands[0].side;
+        sound.cue(520, sidePan[b.show]);
+      }
+      const due = b.lands.find((l) => !l.done && now >= l.at);
+      if (due) {
+        due.done = true;
+        b.show = b.lands.find((l) => !l.done)?.side ?? due.side;
+        const lane = pixeLane(ms);
+        if (hits(due.side, lane)) {
+          b.missed = true;
+          if (b.guard > 0) {
+            b.guard--;
+            call("セコンドの ゴーレムが うけとめた！");
+            sound.sfx.hit();
+          } else {
+            b.hearts--;
+            b.hurt = 18;
+            b.stats.hit++;
+            sound.sfx.damage();
+            if (b.hearts <= 0 && b.saveLeft > 0) {
+              b.saveLeft--;
+              b.hearts = 1;
+              call("セコンドの プルンが ささえて くれた！");
+            } else call("いたっ！");
+            hud();
+            if (b.hearts <= 0) return lose();
+          }
+        } else {
+          b.stats.dodged++;
+          sound.sfx.hover();
+          call("よけた！");
+        }
+        if (b.lands.every((l) => l.done)) {
+          if (b.missed) {
+            b.missed = false;
+            b.state = "rest";
+            b.until = now + b.bt.rest;
+          } else {
+            b.state = "stun";
+            b.until = now + b.stunLen;
+            call("いまだ！ パンチ！");
+          }
+        }
+      }
+    }
+    if (b.state === "stun" && now >= b.until) {
+      b.state = "rest";
+      b.until = now + b.bt.rest;
+      call("");
+    }
+    if (b.flash > 0) b.flash--;
+    if (b.hurt > 0) b.hurt--;
+  }
 
-    // ボスの ばん
-    const act = foe.pattern[b.step++ % foe.pattern.length];
-    const guard = cmd === "guard";
-    const blow = (mult, label) => {
-      const raw = Math.max(1, Math.round(foe.atk * mult) - b.me.def + rnd(1));
-      const dmg = guard ? Math.max(1, Math.round(raw / 4)) : raw;
-      return [label, () => { b.me.hp -= dmg; shake("quest-me-art"); sound.sfx.damage(); }, `ピクセは ${dmg}の ダメージ${guard ? "（まもった！）" : "！"}`];
-    };
-    const out = [];
-    if (ally?.scare && ["hit", "double", "triple", "smash", "breath"].includes(act) && Math.random() < ally.scare) {
-      out.push(ally.say, `${foe.name}は ひるんで うごけない！`);
-    } else if (act === "hit") out.push(...blow(1, `${foe.name}の こうげき！`));
-    else if (act === "double") out.push(`${foe.name}の れんぞく こうげき！`, ...blow(0.6, "1かいめ！").slice(1), ...blow(0.6, "2かいめ！").slice(1));
-    else if (act === "triple") out.push(`${foe.name}の ブンブン こうげき！`, ...[0, 1, 2].flatMap(() => blow(0.6, "").slice(1)));
-    else if (act === "wobble") out.push(`${foe.name}は ぷるぷる ふるえて いる。`);
-    else if (act === "fade") out.push(`${foe.name}の すがたが すうっと うすく なった…`), (b.faded = true);
-    else if (act === "raise") out.push(`${foe.name}は うでを おおきく ふりあげた！`);
-    else if (act === "smash") out.push(...blow(3, `${foe.name}の おおきな いちげき！`));
-    else if (act === "buzz") out.push(`${foe.name}は はねを ブンブン ならして いる…`);
-    else if (act === "inhale") out.push(`${foe.name}は おおきく いきを すいこんだ…`);
-    else if (act === "breath") out.push(...blow(3.5, `${foe.name}は ほのおを はいた！`));
-    await say(out);
-    if (b.me.hp <= 0) return lose();
-    b.busy = false;
-    refresh();
-    battleEl.querySelector(`[data-cmd="${cmd}"]:not(:disabled)`)?.focus();
+  function act(cmd) {
+    if (!b || b.over || b.state === "intro") return;
+    const ms = clock();
+    if (cmd === "left" || cmd === "right") {
+      const dir = cmd === "left" ? "L" : "R";
+      // おなじ ほうへ よけて いる あいだは そのまま。はんたいを おせば すぐ きりかえ（つづけて 2 かい くる わざ）
+      if (b.dodge && ms < b.dodge.until && b.dodge.dir === dir) return;
+      b.dodge = { dir, until: ms + DODGE_MS };
+      return;
+    }
+    if (cmd === "punch") {
+      if (ms < b.punch + PUNCH_MS) return;
+      b.dodge = null; // よけて いても、パンチで まんなかに もどる
+      b.punch = ms;
+      b.stats.punches++;
+      if (b.state === "stun") {
+        b.hp -= b.power;
+        b.flash = 6;
+        sound.sfx.hit();
+        hud();
+        if (b.hp <= 0) return win();
+      } else sound.cue(1400, 0, 0.04); // ガードされた（カキン）
+    }
+  }
+
+  function draw() {
+    const ring = battleEl.querySelector("#quest-ring");
+    if (!ring || !b) return;
+    const c = ring.getContext("2d");
+    const ms = clock();
+    const now = beatNow();
+    const phase = now - Math.floor(now);
+    c.fillStyle = colors.bg;
+    c.fillRect(0, 0, W, H);
+    // リング：ロープと ゆか
+    c.fillStyle = colors.b;
+    c.fillRect(0, 96, W, H - 96);
+    c.fillStyle = colors.v;
+    for (const y of [18, 30, 42]) c.fillRect(0, y, W, 1);
+    c.fillStyle = colors.c;
+    c.fillRect(0, 96, W, 1);
+    // ボス：拍に あわせて はずむ。クセの あいだは かたむき、すきの あいだは 星が まわる
+    const lean = b.state === "tell" ? (b.show === "L" ? -10 : b.show === "R" ? 10 : 0) : 0;
+    const lift = b.state === "tell" && b.show === "C" ? -6 : 0;
+    const bob = phase < 0.18 && b.state !== "stun" ? 2 : 0;
+    const bx = 48 + lean;
+    const by = 8 + lift + bob;
+    c.save();
+    if (b.bt.fade && b.state === "tell") c.globalAlpha = 0.35;
+    if (b.over && b.won) c.globalAlpha = 0.4;
+    if (!(b.flash && b.flash % 2)) c.drawImage(sprites.boss, bx, by + (b.over && b.won ? 12 : 0), 64, 64);
+    c.restore();
+    if (b.state === "stun") {
+      c.fillStyle = colors.y;
+      for (let i = 0; i < 3; i++) {
+        const a = ms / 200 + (i * Math.PI * 2) / 3;
+        c.fillRect(Math.round(80 + Math.cos(a) * 20), Math.round(10 + Math.sin(a) * 5), 2, 2);
+      }
+    }
+    // クセ：その がわに「！」と グローブ
+    if (b.state === "tell") {
+      const next = b.lands.find((l) => !l.done);
+      const prog = next ? Math.min(1, Math.max(0, (now - (next.at - b.tell)) / b.tell)) : 1;
+      const sides = b.show === "C" ? [["C", 76]] : [[b.show, b.show === "L" ? 12 : 140]];
+      for (const [, x] of sides) {
+        if (Math.floor(ms / 120) % 2) {
+          c.font = '8px "Press Start 2P", monospace';
+          c.fillStyle = colors.y;
+          c.textAlign = "center";
+          c.fillText("!", x + 4, 60);
+        }
+        const size = 8 + Math.round(prog * 8);
+        c.drawImage(sprites.glove, x + 4 - size / 2, 66, size, size);
+      }
+    }
+    // ピクセ（うしろ すがた ではなく、いつもの かお）
+    const lane = pixeLane(ms);
+    const px = LANE[lane] + (b.hurt % 4 < 2 && b.hurt ? 2 : 0);
+    const py = PIXE_Y - (ms < b.punch + PUNCH_MS ? 8 : 0);
+    if (!(b.over && !b.won)) c.drawImage(b.hurt ? sprites.blink : sprites.pixe, px - 8, py, 32, 32);
+    else c.drawImage(sprites.blink, px - 8, py + 6, 32, 32);
+    if (ms < b.punch + PUNCH_MS) c.drawImage(sprites.glove, px + 4, py - 10, 8, 8);
+    // はじまりの カウント
+    if (b.state === "intro") {
+      c.font = '8px "Press Start 2P", monospace';
+      c.fillStyle = colors.w;
+      c.textAlign = "center";
+      c.fillText(now < 3 ? String(3 - Math.floor(Math.max(0, now))) : "GO!", 80, 60);
+    }
+  }
+
+  function frame() {
+    raf = requestAnimationFrame(frame);
+    update();
+    draw();
   }
 
   async function win() {
     b.over = true;
+    b.won = true;
     const foe = b.boss;
     const first = !save.beaten.includes(foe.id);
     const exp = first ? foe.exp : Math.ceil(foe.exp / 2);
-    battleEl.querySelector("#quest-foe-art").classList.add("down");
-    sound.sfx.fanfare();
-    const lines = [`${foe.name}を たおした！`, `けいけんち ＋${exp}`];
+    sound.songPlay();
+    sound.sfx.boom();
+    setTimeout(() => sound.sfx.fanfare(), 400);
+    const lines = [`ノックアウト！ ${foe.name}を たおした！`, `けいけんち ＋${exp}`];
     const lv = save.lv;
     const ups = gainExp(exp);
     if (ups) lines.push(`ピクセは LV ${lv + ups} に あがった！`);
@@ -333,28 +527,37 @@ const quest = (() => {
       if (save.beaten.length === BOSSES.length) lines.push("ぜんぶの ボスを たおした！ おめでとう！");
     }
     emit("quest-win", { boss: foe.id, first, lv: save.lv });
-    await say(lines);
-    done();
+    done(lines);
   }
 
-  async function lose() {
+  function lose() {
     b.over = true;
-    const exp = Math.max(1, Math.ceil(b.boss.exp / 4));
-    battleEl.querySelector("#quest-me-art").classList.add("down");
+    b.won = false;
+    sound.songPlay();
     sound.sfx.gameover();
+    const exp = Math.max(1, Math.ceil(b.boss.exp / 4));
     const lv = save.lv;
     const ups = gainExp(exp);
     emit("quest-lose", { boss: b.boss.id });
-    await say(["ピクセは たおれた…", `でも けいけんは のこったよ。けいけんち ＋${exp}`, ...(ups ? [`ピクセは LV ${lv + ups} に あがった！`] : []), "また ちょうせん しよう。"]);
-    done();
+    done(["ピクセは たおれた…", `でも けいけんは のこったよ。けいけんち ＋${exp}`, ...(ups ? [`ピクセは LV ${lv + ups} に あがった！`] : []), `${b.boss.name}の クセ、すこし みえて きたかな？`]);
   }
 
-  // たたかいの あとは コマンドの かわりに「もどる」
-  function done() {
+  // たたかいの あとは ボタンの かわりに けっかと「もどる」
+  function done(lines) {
+    b.log.push(...lines);
+    battleEl.querySelector("#quest-call").innerHTML = "";
+    const box = document.createElement("div");
+    box.className = "quest-log";
+    box.id = "quest-log";
+    box.replaceChildren(...lines.map((t) => Object.assign(document.createElement("p"), { textContent: t })));
     const cmds = battleEl.querySelector("#quest-cmds");
-    cmds.innerHTML = `<button class="quest-cmd back" type="button" id="quest-back"><b>もどる</b></button>`;
-    const back = cmds.querySelector("#quest-back");
+    cmds.replaceWith(box);
+    battleEl.querySelector(".quest-keys").remove();
+    const back = Object.assign(document.createElement("button"), { type: "button", className: "quest-pad back", id: "quest-back" });
+    back.innerHTML = "<b>もどる</b>";
+    box.after(back);
     back.addEventListener("click", () => {
+      cancelAnimationFrame(raf);
       b = null;
       sound.sfx.select();
       renderHome();
@@ -372,6 +575,7 @@ const quest = (() => {
     const diary = trainWhileAway();
     b = null;
     overlay.hidden = false;
+    overlay.scrollTop = 0;
     document.body.classList.add("gaming");
     renderHome(diary);
     homeEl.querySelector(".quest-boss.next, .quest-boss")?.focus();
@@ -380,13 +584,36 @@ const quest = (() => {
   function close() {
     if (!running) return;
     running = false;
+    cancelAnimationFrame(raf);
+    if (b) sound.songPlay();
     b = null;
     overlay.hidden = true;
     document.body.classList.remove("gaming");
   }
   closeBtn.addEventListener("click", close);
   addEventListener("keydown", (e) => {
-    if (running && e.key === "Escape") close();
+    if (!running) return;
+    if (e.key === "Escape") return close();
+    if (!b || b.over || e.repeat) return;
+    const cmd = { ArrowLeft: "left", a: "left", A: "left", ArrowRight: "right", d: "right", D: "right", " ": "punch", ArrowUp: "punch", z: "punch", Z: "punch" }[e.key];
+    if (cmd) {
+      e.preventDefault();
+      act(cmd);
+    }
+  });
+  addEventListener("resize", () => running && fitRing());
+  document.addEventListener("visibilitychange", () => {
+    // 裏に まわったら とめて、もどったら つづきから（時計を ずらす）
+    if (!b || b.over) return;
+    if (document.hidden) {
+      b.pausedAt = clock();
+      cancelAnimationFrame(raf);
+    } else if (b.pausedAt) {
+      b.t0 += clock() - b.pausedAt;
+      if (b.dodge) b.dodge.until += clock() - b.pausedAt;
+      b.pausedAt = 0;
+      raf = requestAnimationFrame(frame);
+    }
   });
 
   return {
@@ -397,6 +624,7 @@ const quest = (() => {
     battle: () => b,
     bosses: () => BOSSES.map((k) => k.id),
     art: (id) => bossById(id).art,
-    setSpeed: (ms) => (speed = ms),
+    act,
+    beatNow: () => (b ? beatNow() : 0),
   };
 })();

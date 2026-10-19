@@ -126,7 +126,8 @@ const sound = (() => {
 
   const midi = (n) => 440 * 2 ** ((n - 69) / 12);
 
-  function tone({ freq, start, dur, type = "square", vol = 0.08, slideTo, dest }) {
+  // pan：-1 で 左、1 で 右から きこえる（PIXE QUEST の ボスの あいず）
+  function tone({ freq, start, dur, type = "square", vol = 0.08, slideTo, dest, pan = 0 }) {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = type;
@@ -134,7 +135,14 @@ const sound = (() => {
     if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, start + dur);
     gain.gain.setValueAtTime(vol, start);
     gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
-    osc.connect(gain).connect(dest ?? sfxGain);
+    let out = gain;
+    if (pan && ctx.createStereoPanner) {
+      out = ctx.createStereoPanner();
+      out.pan.value = pan;
+      gain.connect(out);
+    }
+    osc.connect(gain);
+    out.connect(dest ?? sfxGain);
     osc.start(start);
     osc.stop(start + dur);
   }
@@ -216,8 +224,7 @@ const sound = (() => {
   };
 
   // 店内 BGM：C → Am → F → G の 4 小節ループ（8分音符きざみ、null は 休符）。リンク集とは べつの 曲
-  const BPM = 150;
-  const STEP = 60 / BPM / 2;
+  // PIXE QUEST の ボスの 曲も おなじ かたち（{ bpm, lead, bass }）で、songPlay で いれかえる
   const LEAD = [
     72, 76, 79, 76, 84, null, 79, null,
     81, null, 76, 72, 76, 81, 79, 76,
@@ -225,17 +232,22 @@ const sound = (() => {
     79, null, 83, 79, 86, 84, 83, 79,
   ];
   const BASS = [48, 45, 41, 43];
+  const SHOP = { bpm: 150, lead: LEAD, bass: BASS };
+  let song = SHOP;
+  const stepLen = () => 60 / song.bpm / 2;
 
   let timer = null;
   let step = 0;
   let nextTime = 0;
 
   function scheduleStep(i, t) {
-    const n = LEAD[i];
+    const STEP = stepLen();
+    const n = song.lead[i];
     if (n) tone({ freq: midi(n), start: t, dur: STEP * 0.9, vol: 0.035, dest: bgmGain });
-    const root = BASS[Math.floor(i / 8)] + (i % 2 ? 12 : 0);
+    const root = song.bass[Math.floor(i / 8) % song.bass.length] + (i % 2 ? 12 : 0);
     tone({ freq: midi(root), start: t, dur: STEP * 0.9, type: "triangle", vol: 0.12, dest: bgmGain });
     if (i % 2 === 1) noise(t, 0.03, 0.03, bgmGain);
+    if (song.kick && i % 4 === 0) tone({ freq: 110, start: t, dur: 0.08, type: "triangle", vol: 0.2, slideTo: 40, dest: bgmGain });
   }
 
   function bgmPlay(delay = 0) {
@@ -249,8 +261,8 @@ const sound = (() => {
       if (nextTime < ctx.currentTime) nextTime = ctx.currentTime + 0.05;
       while (nextTime < ctx.currentTime + 0.12) {
         scheduleStep(step, nextTime);
-        nextTime += STEP;
-        step = (step + 1) % LEAD.length;
+        nextTime += stepLen();
+        step = (step + 1) % song.lead.length;
       }
     }, 25);
   }
@@ -276,5 +288,17 @@ const sound = (() => {
   }
   document.addEventListener("visibilitychange", () => (document.hidden ? pause() : resume()));
 
-  return { sfx, bgmPlay, bgmStop, playing: () => !!timer };
+  // 曲を いれかえる（BGM が オフなら ならさない。あとで オンに すれば その 曲から）。songPlay() で 店内 BGM に もどす
+  function songPlay(next = SHOP) {
+    song = next;
+    step = 0;
+    if (timer && ctx) nextTime = ctx.currentTime + 0.05;
+  }
+
+  // 左右から きこえる みじかい 音（ボスの あいず）
+  function cue(freq, pan = 0, dur = 0.12) {
+    if (ensure()) tone({ freq, start: ctx.currentTime, dur, vol: 0.07, pan, type: "square" });
+  }
+
+  return { sfx, bgmPlay, bgmStop, songPlay, cue, playing: () => !!timer };
 })();
