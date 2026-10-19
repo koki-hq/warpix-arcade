@@ -104,7 +104,7 @@ if (jobs === 1 || only) {
     new Promise((resolve) => {
       const t0 = Date.now();
       const child = spawn(process.execPath, [me, "--files", file], {
-        env: { ...process.env, WARPIX_PORT_BASE: String(10400 + i * 150) },
+        env: { ...process.env, WARPIX_PORT_BASE: String(11400 + i * 150) },
         stdio: ["ignore", "pipe", "inherit"],
       });
       let buf = "";
