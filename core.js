@@ -74,19 +74,6 @@ const NPC = {
   ],
 };
 
-const MOTHERSHIP = [
-  "........cccccccc........",
-  "......cccccccccccc......",
-  ".....cc.cc.cc.cc.cc.....",
-  "..wwwwwwwwwwwwwwwwwwww..",
-  ".wwwwwwwwwwwwwwwwwwwwww.",
-  "wpwwwpwwwpwwwwpwwwpwwwpw",
-  ".wwwwwwwwwwwwwwwwwwwwww.",
-  "..wwwwwwwwwwwwwwwwwwww..",
-  "....w..w........w..w....",
-  "...w...w........w...w...",
-];
-
 // 同じ色が 横に ならんだ マスは 1 本の 線に まとめ、色ごとに 1 つの <path> にする
 function pixelSvg(rows, palette = PALETTE) {
   const paths = new Map(); // 色 → d

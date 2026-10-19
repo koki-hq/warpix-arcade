@@ -4,5 +4,6 @@
 
 | バージョン | 名前 | 中身 |
 | --- | --- | --- |
+| [v0.2](v0.2.md) | GAME A・B と 4 たいの ボス | PIXE INVADERS を 看板の 台に：GAME A（ふつう）・GAME B（はやい）、名前と 顔の ある ボス 4 たい、台の よこで ピクセが おうえん |
 | [v0.1.1](v0.1.1.md) | arcade.warpix.app | 独自ドメインに 引っ越し（中身は おなじ） |
 | [v0.1](v0.1.md) | 開店じゅんび | PRESS START・受付の ピクセ・台 4 だい（PIXE INVADERS と COMING SOON 3 だい）・店内 BGM・ホーム画面アプリ |

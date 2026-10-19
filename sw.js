@@ -1,6 +1,6 @@
 // ---------- サービスワーカー：オフラインでも あそべる ように（warpix-link と おなじ しくみ） ----------
 // 公開するたびに VERSION を上げると、新しいファイルを取り直す
-const VERSION = "arcade-v0.1.0";
+const VERSION = "arcade-v0.2.0";
 const FONT_CACHE = "arcade-fonts";
 const FILES = [
   "./",

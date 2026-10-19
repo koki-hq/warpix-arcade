@@ -57,10 +57,18 @@
 
   <div class="game" id="game" role="dialog" aria-label="PIXE INVADERS" hidden>
     <div class="game-head">
-      <span>PIXE INVADERS</span>
+      <span>PIXE INVADERS <span class="game-head-mode" id="game-head-mode"></span></span>
       <button class="game-close" id="game-close" type="button">✕ ESC</button>
     </div>
-    <canvas class="game-canvas" id="game-canvas" tabindex="0"></canvas>
+    <div class="game-cheer" id="game-cheer">
+      <span class="game-cheer-pixe" aria-hidden="true"></span>
+      <p class="game-cheer-text" id="game-cheer-text" aria-live="polite"></p>
+    </div>
+    <canvas class="game-canvas" id="game-canvas" tabindex="0" aria-label="ゲームの 画面"></canvas>
+    <div class="game-modes" id="game-modes" hidden>
+      <button class="game-mode" type="button" data-mode="a"><span class="game-mode-name">GAME A</span><span class="game-mode-sub">ふつう</span></button>
+      <button class="game-mode" type="button" data-mode="b"><span class="game-mode-name">GAME B</span><span class="game-mode-sub">はやい</span></button>
+    </div>
     <p class="game-help">← → か ドラッグで いどう ・ ショットは じどう</p>
   </div>
 
@@ -76,13 +84,16 @@
       <ul>
         <li>台を おすと はじまります。とじるときは「✕ ESC」</li>
         <li>PIXE INVADERS：← → か、画面を ドラッグして うごく。ショットは じどう</li>
+        <li>GAME A は ふつう、GAME B は はやい。ランキングは べつべつ</li>
+        <li>3 ウェーブごとに ボス。ボスは 4 たい。あった ボスは タイトルに 顔が でます</li>
         <li>ベスト 5 に はいったら、なまえを 3 もじ きざめます</li>
       </ul>
       <h3>ホーム画面に 入れると</h3>
       <p>アプリの ように ひらけて、ネットが なくても あそべます。</p>
       <h3>この ブラウザに のこす もの</h3>
       <ul>
-        <li>ランキングと、さいごに いれた なまえ</li>
+        <li>ランキング（GAME A・B）と、さいごに いれた なまえ</li>
+        <li>あった ことの ある ボス</li>
         <li>来た かい数（ピクセの あいさつに つかう）</li>
         <li>BGM の オン・オフ</li>
       </ul>

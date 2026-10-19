@@ -37,7 +37,7 @@ export default {
     await p.boot();
     const cabs = await p.ev(`[...document.querySelectorAll(".cab")].map((c) => [c.dataset.cab, c.classList.contains("soon"), c.querySelector(".cab-marquee").textContent, c.querySelector(".cab-hi").textContent])`);
     t.eq(cabs, [
-      ["invaders", false, "PIXE INVADERS", "HI ------"],
+      ["invaders", false, "PIXE INVADERS", "A ------B ------"],
       ["soon-1", true, "COMING SOON", "にゅうか まち"],
       ["soon-2", true, "COMING SOON", "にゅうか まち"],
       ["soon-3", true, "COMING SOON", "にゅうか まち"],
@@ -75,14 +75,20 @@ export default {
     await p.click("#about-close");
     t.ok(await p.ev(`!document.getElementById("about").open`), "とじない");
     // この ブラウザに のこして いる キーが、ぜんぶ せつめい されて いる
-    await p.ev(`invaders.open()`);
+    await p.ev(`invaders.open({ mode: "b" })`);
+    await t.sleep(300);
+    await p.ev(`(() => { const s = invaders.state(); s.wave = 2; s.enemies.forEach((e) => (e.alive = false)); })()`);
+    await t.sleep(3600); // ボスの ウェーブまで
+    await p.ev(`(() => { const s = invaders.state(); s.boss.hp = 1; s.bullets.push({ x: s.boss.x + 24, y: s.boss.y + 20 }); })()`);
+    await t.sleep(3000); // つぎの ウェーブが はじまるまで
     await t.sleep(1800); // WAVE 1 の ひょうじが おわるまで
     await p.ev(`(() => { const s = invaders.state(); s.score = 100; s.lives = 1; s.inv = 0; s.ebullets.push({ x: s.px + 4, y: 120, v: 1 }); })()`);
     await t.sleep(800);
     await p.key("Escape");
     const keys = await p.ev(`Object.keys(localStorage).sort()`);
-    t.eq(keys, ["warpix-arcade-bgm", "warpix-arcade-visits", "warpix-rank-name", "warpix-ranking"].filter((k) => keys.includes(k)), `せつめい して いない キー: ${keys}`);
-    t.ok(keys.includes("warpix-ranking"), "ランキングが のこらない");
+    t.eq(keys, ["warpix-arcade-bgm", "warpix-arcade-bosses", "warpix-arcade-ranking-b", "warpix-arcade-visits", "warpix-rank-name", "warpix-ranking"].filter((k) => keys.includes(k)), `せつめい して いない キー: ${keys}`);
+    t.ok(keys.includes("warpix-arcade-ranking-b") && keys.includes("warpix-arcade-bosses"), "ランキングや ボスが のこらない");
+    t.ok(text.includes("あった ことの ある ボス"), "ボスの きろくの せつめい");
     t.noErrors(p);
     await server.close();
   },

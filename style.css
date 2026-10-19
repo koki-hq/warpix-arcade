@@ -436,6 +436,10 @@ body {
 }
 
 .cab-hi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   font-size: 7px;
   color: var(--gold);
   white-space: nowrap;
@@ -542,6 +546,11 @@ body {
   color: var(--accent);
 }
 
+.game-head-mode {
+  margin-left: 8px;
+  color: var(--gold);
+}
+
 .game-close {
   padding: 6px 8px;
   border: 0;
@@ -562,6 +571,95 @@ body {
     0 var(--px) 0 0 var(--fg),
     calc(var(--px) * -1) 0 0 0 var(--fg),
     var(--px) 0 0 0 var(--fg);
+}
+
+/* 台の よこで おうえんする ピクセ（2 ぎょうぶんの たかさを とって おき、画面が ゆれない ように） */
+.game-cheer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 360px);
+}
+
+.game-cheer-pixe {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.game-cheer-pixe svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.game-cheer.hop .game-cheer-pixe {
+  animation: jump 0.3s steps(3);
+}
+
+.game-cheer-text {
+  flex: 1;
+  min-height: 2.8em;
+  margin: 0;
+  padding: 4px 10px;
+  border-left: var(--px) solid var(--accent-2);
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.4;
+  white-space: pre-line;
+}
+
+.game-cheer-text:empty {
+  visibility: hidden;
+}
+
+.game.demo .game-cheer {
+  visibility: hidden;
+}
+
+/* GAME A・B（ゲーム&ウオッチの ボタンの ように） */
+.game-modes {
+  display: flex;
+  gap: 16px;
+}
+
+.game-modes[hidden] {
+  display: none;
+}
+
+.game-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  padding: 12px 14px 10px;
+  border: 0;
+  background: var(--btn);
+  color: var(--fg);
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--fg),
+    0 var(--px) 0 0 var(--fg),
+    calc(var(--px) * -1) 0 0 0 var(--fg),
+    var(--px) 0 0 0 var(--fg);
+}
+
+.game-mode-name {
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  color: var(--gold);
+}
+
+.game-mode-sub {
+  font-size: 14px;
+}
+
+.game-mode:hover,
+.game-mode:focus-visible {
+  background: var(--btn-hover);
+  outline: var(--px) solid var(--accent-2);
+  outline-offset: 6px;
 }
 
 .game-help {

@@ -13,9 +13,9 @@ WARPIX製作所の 第二弾。ドットと チップチューンの 台で、�
 - **PRESS START で お店に はいる**：コインの 音と 起動ジングル、店内 BGM（リンク集とは べつの 曲。オン・オフは おぼえる）
 - **受付の ピクセ**：はじめての 人には あいさつ、2 かいめからは「おかえり」と ハイスコアの はなし。つつくと おしゃべり。あそび おわると ほめて くれる
 - **台の ならび**：いまは 1 だい（PIXE INVADERS）。まだ ない 台は 布を かぶった「COMING SOON」
-- **PIXE INVADERS**：warpix-link の ミニゲームが 土台。3 ウェーブごとに ボス。ベスト 5 に なまえを 3 もじ。台の 看板の 下に HI と なまえ
+- **PIXE INVADERS**：warpix-link の ミニゲームが 土台。ゲーム&ウオッチの ように **GAME A（ふつう）・GAME B（はやい）**、ランキングは べつべつ。3 ウェーブごとに **名前と 顔の ある ボス**（UFOさん・タコ・カニ・ネコ）。あった ボスは タイトルに 顔が のこる。あそんで いる あいだ、台の よこで ピクセが おうえん。ベスト 5 に なまえを 3 もじ。台の 看板の 下に A・B の HI
 - **ホーム画面に 入れられる**（PWA）。一度 ひらけば オフラインでも あそべる
-- **この ブラウザにだけ のこす**：ランキング・なまえ・来た かい数・BGM。どこにも 送らない
+- **この ブラウザにだけ のこす**：ランキング（A・B）・なまえ・あった ボス・来た かい数・BGM。どこにも 送らない
 
 ## ファイル
 
@@ -23,7 +23,7 @@ WARPIX製作所の 第二弾。ドットと チップチューンの 台で、�
 index.html        ページ（PRESS START・フロア・ゲームの 画面・このページについて）
 style.css         見た目（色は warpix-link と おなじ 紺・ピンク・シアン）
 core.js           合図・保存・ドット絵・音（warpix-link から ひっこし）
-invaders.js       1 だいめ PIXE INVADERS（warpix-link の game.js から）
+invaders.js       1 だいめ PIXE INVADERS（warpix-link の game.js から。GAME A・B、ボス 4 たい、おうえんの ピクセ）
 hall.js           フロア：PRESS START・受付の ピクセ・台・BGM・このページについて
 sw.js             オフライン（公開ごとに VERSION を 上げる）
 manifest.webmanifest, icons/   ホーム画面アプリ（アイコンの 元は tools/icon.html）
@@ -42,7 +42,7 @@ tools/            health.mjs（健康診断）・fonts.mjs・shoot-icons.mjs
 ## テスト
 
 ```bash
-node tests/run.mjs            # ぜんぶ（9 件。あいて いる メモリで 2〜5 つ 同時に）
+node tests/run.mjs            # ぜんぶ（10 件。あいて いる メモリで 2〜5 つ 同時に）
 node tests/run.mjs invaders   # 名前に invaders を ふくむ ものだけ
 node tools/health.mjs         # 重さ・速さ・待機 CPU・アクセシビリティ（axe）
 ```

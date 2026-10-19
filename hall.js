@@ -84,6 +84,8 @@ const hall = (() => {
     "コインは いらないよ。\nぜんぶ ただで あそべるんだ。",
     "あたらしい だいが はいったら\nここで おしらせ するね。",
     "インベーダーは ドラッグで\nうごかすと らくちん。",
+    "GAME B は はやいよ。\nうでに じしんが あったら どうぞ。",
+    "インベーダーの ボスは 4たい。\nぜんぶに あえたかな？",
     "ハイスコアを だしたら\nなまえを 3もじ きざめるよ。",
     "となりの へやには リンク集も\nあるよ。したの ボタンから いける。",
     "ここは WARPIX製作所の\nゲームセンター。ゆっくり していってね。",
@@ -96,17 +98,17 @@ const hall = (() => {
   });
 
   // ---------- 台 ----------
-  const hiOf = () => invaders.ranking()[0] ?? null;
+  const hiOf = (m = "a") => invaders.ranking(m)[0] ?? null;
   const CABINETS = [
-    { id: "invaders", name: "PIXE INVADERS", open: () => invaders.open(), hi: hiOf },
+    { id: "invaders", name: "PIXE INVADERS", open: () => invaders.open(), hi: () => ["a", "b"].map((m) => [m, hiOf(m)]) },
     { id: "soon-1", soon: true },
     { id: "soon-2", soon: true },
     { id: "soon-3", soon: true },
   ];
 
+  // GAME A・B の いちばん。「A 001234 KOY」、まだ ない ときは「B ------」
   function hiText(cab) {
-    const top = cab.hi?.();
-    return top ? `HI ${String(top.s).padStart(6, "0")} ${top.n}` : "HI ------";
+    return cab.hi().map(([m, top]) => `${m.toUpperCase()} ${top ? `${String(top.s).padStart(6, "0")} ${top.n}` : "------"}`);
   }
 
   for (const cab of CABINETS) {
@@ -133,24 +135,33 @@ const hall = (() => {
     floor.append(el);
   }
   function refreshHi() {
-    for (const cab of CABINETS) if (!cab.soon) floor.querySelector(`[data-cab="${cab.id}"] .cab-hi`).textContent = hiText(cab);
+    for (const cab of CABINETS) {
+      if (cab.soon) continue;
+      const el = floor.querySelector(`[data-cab="${cab.id}"] .cab-hi`);
+      el.replaceChildren(...hiText(cab).map((t) => Object.assign(document.createElement("span"), { textContent: t })));
+    }
   }
   refreshHi();
 
   // あそび おわったら、ピクセが ひとこと（ゲームの 画面が とじてから）
   let result = null;
-  on("game-over", ({ score: s }) => (result = { score: s, rank: 0 }));
+  let bosses = 0;
+  on("game-start", () => (bosses = 0));
+  on("game-boss", () => bosses++);
+  on("game-over", ({ score: s, mode }) => (result = { score: s, rank: 0, mode, bosses }));
   on("game-rank", ({ rank }) => result && (result.rank = rank));
   const overlay = document.getElementById("game");
   new MutationObserver(() => {
     if (!overlay.hidden) return;
     refreshHi();
     if (!result) return;
-    const { score: s, rank } = result;
+    const { score: s, rank, mode, bosses: n } = result;
     result = null;
     jump();
-    if (rank === 1) interrupt([`すごい！ ハイスコア こうしん！\n${s}てん！`, "なまえが いちばん うえに\nのったよ。"]);
-    else if (rank) interrupt([`ランキングの ${rank}いに\nなまえが のったね！`, "つぎは いちばん うえを\nめざそう。"]);
+    const game = mode === "b" ? "GAME B" : "GAME A";
+    if (rank === 1) interrupt([`すごい！ ${game}の\nハイスコア こうしん！ ${s}てん！`, "なまえが いちばん うえに\nのったよ。"]);
+    else if (rank) interrupt([`${game}の ランキング ${rank}いに\nなまえが のったね！`, "つぎは いちばん うえを\nめざそう。"]);
+    else if (n) interrupt([`おつかれさま！ ボスを\n${n}たい たおしたね。`, `${s}てん。また いつでも どうぞ。`]);
     else interrupt([`おつかれさま！\n${s}てん だったね。`, "もう いっかい あそぶ？"]);
   }).observe(overlay, { attributes: true, attributeFilter: ["hidden"] });
 
