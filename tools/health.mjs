@@ -99,6 +99,9 @@ async function axe(p, label, setup = "") {
   await axe(p, "このページについて", `document.getElementById("about-btn").click()`);
   await p.ev(`document.getElementById("about").close()`);
   await axe(p, "PIXE INVADERS", `document.querySelector('[data-cab="invaders"]').click()`);
+  await p.ev(`invaders.close()`);
+  await axe(p, "PIXE QUEST", `document.querySelector('[data-cab="quest"]').click()`);
+  await axe(p, "PIXE QUEST たたかい", `document.querySelector('[data-boss="purun"]').click()`);
   await closeAll();
 }
 

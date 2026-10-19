@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="core.js" defer></script>
   <script src="invaders.js" defer></script>
+  <script src="quest.js" defer></script>
   <script src="hall.js" defer></script>
 </head>
 <body>
@@ -72,6 +73,15 @@
     <p class="game-help">← → か ドラッグで いどう ・ ショットは じどう</p>
   </div>
 
+  <div class="game quest" id="quest" role="dialog" aria-label="PIXE QUEST" hidden>
+    <div class="game-head">
+      <span>PIXE QUEST</span>
+      <button class="game-close" id="quest-close" type="button">✕ ESC</button>
+    </div>
+    <section class="quest-home" id="quest-home"></section>
+    <section class="quest-battle" id="quest-battle" hidden></section>
+  </div>
+
   <dialog class="about" id="about" aria-labelledby="about-title">
     <div class="about-top">
       <h2 id="about-title">このページについて</h2>
@@ -87,6 +97,7 @@
         <li>GAME A は ふつう、GAME B は はやい。ランキングは べつべつ</li>
         <li>3 ウェーブごとに ボス。ボスは 4 たい。あった ボスは タイトルに 顔が でます</li>
         <li>ベスト 5 に はいったら、なまえを 3 もじ きざめます</li>
+        <li>PIXE QUEST：ピクセと ボスが じゅんばんに たたかう ゲーム。いそがなくて だいじょうぶ。来なかった あいだも ピクセは しゅぎょう して います。たおした ボスは なかまに なります</li>
       </ul>
       <h3>ホーム画面に 入れると</h3>
       <p>アプリの ように ひらけて、ネットが なくても あそべます。</p>
@@ -94,6 +105,8 @@
       <ul>
         <li>ランキング（GAME A・B）と、さいごに いれた なまえ</li>
         <li>あった ことの ある ボス</li>
+        <li>PIXE QUEST の ピクセ（LV・けいけんち・たおした ボス・なかま・さいごに 来た 時間）</li>
+        <li>見た ことの ある 台（あたらしい 台の おしらせに つかう）</li>
         <li>来た かい数（ピクセの あいさつに つかう）</li>
         <li>BGM の オン・オフ</li>
       </ul>
