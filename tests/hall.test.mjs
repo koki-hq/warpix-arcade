@@ -86,7 +86,7 @@ export default {
     await t.sleep(800);
     await p.key("Escape");
     const keys = await p.ev(`Object.keys(localStorage).sort()`);
-    t.eq(keys, ["warpix-arcade-bgm", "warpix-arcade-bosses", "warpix-arcade-quest", "warpix-arcade-ranking-b", "warpix-arcade-seen", "warpix-arcade-visits", "warpix-rank-name", "warpix-ranking"].filter((k) => keys.includes(k)), `せつめい して いない キー: ${keys}`);
+    t.eq(keys, ["warpix-arcade-bgm", "warpix-arcade-bosses", "warpix-arcade-days", "warpix-arcade-quest", "warpix-arcade-ranking-b", "warpix-arcade-seen", "warpix-arcade-visits", "warpix-rank-name", "warpix-ranking"].filter((k) => keys.includes(k)), `せつめい して いない キー: ${keys}`);
     t.ok(keys.includes("warpix-arcade-ranking-b") && keys.includes("warpix-arcade-bosses"), "ランキングや ボスが のこらない");
     t.ok(text.includes("あった ことの ある ボス"), "ボスの きろくの せつめい");
     t.noErrors(p);

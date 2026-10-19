@@ -239,6 +239,13 @@ const hall = (() => {
     }
   });
 
+  // おみせの かざりを おすと、その はなし
+  shop.talk((item) => {
+    jump();
+    sound.sfx.hover();
+    interrupt([item.talk]);
+  });
+
   // 入荷の おしらせ：まえに 来た ときに なかった 台を ピクセが しょうかい する
   const NEW = { quest: "あたらしい だい「PIXE QUEST」が\nはいったよ！ ぼくを そだてる ゲーム。" };
   function greet() {
@@ -250,10 +257,11 @@ const hall = (() => {
     store.set(SEEN_KEY, ids);
     const fresh = ids.filter((id) => !seen.includes(id) && NEW[id]).map((id) => NEW[id]);
     const top = hiOf();
+    const decor = shop.visit();
     if (visits === 1) {
       say(["いらっしゃい！ ここは\nピクセの ゲームセンター。", `いまは ${ids.length}だい。\nこれから すこしずつ ふえるよ。`, "すきな だいで あそんでってね！"]);
     } else {
-      say(["おかえり！ きょうも\nあそんでく？", ...fresh, ...(!fresh.length && top ? [`PIXE INVADERS の ハイスコアは\n${top.s}てん。こえられるかな？`] : [])]);
+      say(["おかえり！ きょうも\nあそんでく？", ...(decor ? [decor.new] : []), ...fresh, ...(!fresh.length && !decor && top ? [`PIXE INVADERS の ハイスコアは\n${top.s}てん。こえられるかな？`] : [])]);
     }
   }
 

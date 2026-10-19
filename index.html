@@ -23,6 +23,7 @@
   <script src="core.js" defer></script>
   <script src="invaders.js" defer></script>
   <script src="quest.js" defer></script>
+  <script src="shop.js" defer></script>
   <script src="hall.js" defer></script>
 </head>
 <body>
@@ -46,6 +47,8 @@
         <span class="dialog-next" aria-hidden="true">▼</span>
       </div>
     </section>
+
+    <section class="shop" id="shop" aria-label="おみせの かざり" hidden></section>
 
     <section class="floor" id="floor" aria-label="ゲームの 台"></section>
 
@@ -99,6 +102,8 @@
         <li>ベスト 5 に はいったら、なまえを 3 もじ きざめます</li>
         <li>PIXE QUEST：ピクセと ボスが じゅんばんに たたかう ゲーム。いそがなくて だいじょうぶ。来なかった あいだも ピクセは しゅぎょう して います。たおした ボスは なかまに なります</li>
       </ul>
+      <h3>おみせが そだつ</h3>
+      <p>来た 日ごとに、おみせの かざりが 1 つずつ ふえます（10 こまで）。かざりを おすと、ピクセが その はなしを します。</p>
       <h3>ホーム画面に 入れると</h3>
       <p>アプリの ように ひらけて、ネットが なくても あそべます。</p>
       <h3>この ブラウザに のこす もの</h3>
@@ -107,6 +112,7 @@
         <li>あった ことの ある ボス</li>
         <li>PIXE QUEST の ピクセ（LV・けいけんち・たおした ボス・なかま・さいごに 来た 時間）</li>
         <li>見た ことの ある 台（あたらしい 台の おしらせに つかう）</li>
+        <li>来た 日の かずと、さいごに 来た 日（おみせの かざりが ふえる）</li>
         <li>来た かい数（ピクセの あいさつに つかう）</li>
         <li>BGM の オン・オフ</li>
       </ul>

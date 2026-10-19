@@ -183,6 +183,7 @@ body {
 .title,
 .subtitle,
 .npc,
+.shop,
 .floor,
 .footer,
 .bgm-toggle {
@@ -200,7 +201,8 @@ body {
   animation: fade-in 0.3s steps(3) 0.5s both;
 }
 
-.booted .floor {
+.booted .floor,
+.booted .shop {
   animation: fade-in 0.3s steps(3) 0.7s both;
 }
 
@@ -325,6 +327,56 @@ body {
 .dialog.more .dialog-next {
   visibility: visible;
   animation: blink 0.6s steps(1) infinite;
+}
+
+/* ---------- おみせの かざり（来た 日ごとに ふえる） ---------- */
+.shop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px 10px;
+  padding: 4px 0 8px;
+  border-bottom: var(--px) dotted var(--btn);
+}
+
+.shop[hidden] {
+  display: none;
+}
+
+.shop-item {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.shop-item svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.shop-item.neon {
+  width: auto;
+  padding: 0 6px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 12px;
+  color: var(--accent);
+  text-shadow: 0 0 6px var(--accent);
+}
+
+.shop-item:hover,
+.shop-item:focus-visible {
+  outline: var(--px) solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+/* きょう ふえた かざりは ぴょんと */
+.booted .shop-item.fresh {
+  animation: jump 0.3s steps(3) 1.2s 3;
 }
 
 /* ---------- 台の ならび ---------- */
