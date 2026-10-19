@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>WARPIX-ARCADE</title>
+  <meta name="description" content="ピクセが まってる、レトロゲームの ゲームセンター。ドットと チップチューンの 台で、ただで あそべる。台は すこしずつ 入荷します。">
+  <meta property="og:title" content="WARPIX-ARCADE">
+  <meta property="og:description" content="ピクセが まってる、レトロゲームの ゲームセンター。">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0f0b1e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ARCADE">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="core.js" defer></script>
+  <script src="invaders.js" defer></script>
+  <script src="hall.js" defer></script>
+</head>
+<body>
+  <section class="start-screen" id="start-screen" aria-label="PRESS START">
+    <p class="start-title" aria-hidden="true">WARPIX<span>-</span>ARCADE</p>
+    <p class="start-tagline"><span>ピクセが まってる、</span><span>レトロゲームの ゲームセンター。</span></p>
+    <button class="start-btn" id="start-btn" type="button">PRESS START</button>
+    <p class="start-hint">TAP TO INSERT COIN</p>
+  </section>
+
+  <button class="bgm-toggle" id="bgm-toggle" type="button" aria-pressed="true">BGM ON</button>
+
+  <main class="screen">
+    <h1 class="title">WARPIX<span class="title-dash">-</span>ARCADE</h1>
+    <p class="subtitle">INSERT COIN<span class="cursor">_</span></p>
+
+    <section class="npc" aria-label="うけつけの ピクセ">
+      <button class="npc-sprite" id="npc" type="button" aria-label="うけつけの ピクセを つつく"><span class="npc-body"></span></button>
+      <div class="dialog" id="dialog" aria-live="polite">
+        <p class="dialog-text" id="dialog-text"></p>
+        <span class="dialog-next" aria-hidden="true">▼</span>
+      </div>
+    </section>
+
+    <section class="floor" id="floor" aria-label="ゲームの 台"></section>
+
+    <footer class="footer">
+      <a class="door" href="https://link.warpix.app/">となりの へや：WARPIX-LINK（リンク集） ▶</a>
+      <button class="about-btn" id="about-btn" type="button">このページについて</button>
+      <p class="copyright">© 2026 WARPIX製作所</p>
+    </footer>
+  </main>
+
+  <div class="game" id="game" role="dialog" aria-label="PIXE INVADERS" hidden>
+    <div class="game-head">
+      <span>PIXE INVADERS</span>
+      <button class="game-close" id="game-close" type="button">✕ ESC</button>
+    </div>
+    <canvas class="game-canvas" id="game-canvas" tabindex="0"></canvas>
+    <p class="game-help">← → か ドラッグで いどう ・ ショットは じどう</p>
+  </div>
+
+  <dialog class="about" id="about" aria-labelledby="about-title">
+    <div class="about-top">
+      <h2 id="about-title">このページについて</h2>
+      <button class="about-close" id="about-close" type="button" aria-label="とじる">✕</button>
+    </div>
+    <div class="about-body">
+      <p class="about-lead"><span>ピクセが まってる、</span><span>レトロゲームの ゲームセンター。</span></p>
+      <p>WARPIX製作所の ゲームセンターです。ぜんぶ ただで あそべます。台は これから すこしずつ 入荷します。</p>
+      <h3>あそびかた</h3>
+      <ul>
+        <li>台を おすと はじまります。とじるときは「✕ ESC」</li>
+        <li>PIXE INVADERS：← → か、画面を ドラッグして うごく。ショットは じどう</li>
+        <li>ベスト 5 に はいったら、なまえを 3 もじ きざめます</li>
+      </ul>
+      <h3>ホーム画面に 入れると</h3>
+      <p>アプリの ように ひらけて、ネットが なくても あそべます。</p>
+      <h3>この ブラウザに のこす もの</h3>
+      <ul>
+        <li>ランキングと、さいごに いれた なまえ</li>
+        <li>来た かい数（ピクセの あいさつに つかう）</li>
+        <li>BGM の オン・オフ</li>
+      </ul>
+      <p class="about-note">どこにも 送りません。ほかの 人には 見えません。ドット文字の 一部は Google Fonts から よみます。</p>
+      <h3>となりの へや</h3>
+      <p><a href="https://link.warpix.app/">WARPIX-LINK</a>：いつものアプリを、ちょっと楽しくひらく入口。</p>
+      <p class="about-credit">© 2026 <a href="https://warpix.app/" target="_blank" rel="noopener">WARPIX製作所<span class="sr-only">（あたらしい タブで ひらく）</span></a> ／ いっしょに つくった：Claude<br>
+        <a href="https://github.com/koki-hq/warpix-arcade" target="_blank" rel="noopener">ソースコード（GitHub）<span class="sr-only">（あたらしい タブで ひらく）</span></a></p>
+    </div>
+  </dialog>
+</body>
+</html>

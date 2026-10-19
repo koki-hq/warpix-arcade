@@ -1,0 +1,687 @@
+/* 日本語の ドット文字：この サイトで つかう 文字 だけに した DotGothic16（tools/fonts.mjs で つくる、OFL：fonts/OFL-DotGothic16.txt） */
+@font-face {
+  font-family: "DotGothic16";
+  src: url("fonts/dotgothic16.woff2") format("woff2");
+  font-display: swap;
+}
+
+/* 色は warpix-link と おなじ（紺・ピンク・シアン） */
+:root {
+  --bg: #0f0b1e;
+  --bg-grid: #1a1433;
+  --fg: #f4f4f4;
+  --accent: #ff4fa3;
+  --accent-2: #3ee8ff;
+  --btn: #2a2150;
+  --btn-hover: #3d2f78;
+  --shadow: #000;
+  --muted: #8a80b8;
+  --gold: #ffd84a;
+  --px: 4px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--bg-grid) 2px, transparent 2px),
+    linear-gradient(90deg, var(--bg-grid) 2px, transparent 2px);
+  background-size: 32px 32px;
+  color: var(--fg);
+  font-family: "DotGothic16", "Press Start 2P", monospace;
+  image-rendering: pixelated;
+  -webkit-font-smoothing: none;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 中身は はばいっぱい（480px まで） */
+.npc,
+.floor,
+.footer {
+  width: 100%;
+}
+
+.screen {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 72px 16px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.title {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(20px, 6.4vw, 32px);
+  line-height: 1.3;
+  letter-spacing: 2px;
+  text-align: center;
+  text-shadow:
+    var(--px) 0 0 var(--accent),
+    calc(var(--px) * 2) var(--px) 0 var(--shadow);
+}
+
+.title-dash,
+.start-title span {
+  color: var(--accent-2);
+}
+
+.subtitle {
+  margin: -8px 0 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--accent-2);
+}
+
+.cursor {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- PRESS START ---------- */
+.start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 16px;
+  background: rgba(15, 11, 30, 0.92);
+  cursor: pointer;
+}
+
+.start-screen[hidden] {
+  display: none;
+}
+
+.start-title {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(20px, 6.4vw, 32px);
+  text-align: center;
+  text-shadow: var(--px) 0 0 var(--accent), calc(var(--px) * 2) var(--px) 0 var(--shadow);
+}
+
+/* ひとこと。せまい 画面では「、」の ところで 2 行に */
+.start-tagline,
+.about-lead {
+  margin: 0;
+  font-size: 16px;
+  text-align: center;
+}
+
+.start-tagline span,
+.about-lead span {
+  display: inline-block;
+}
+
+.about-lead {
+  margin-top: 12px;
+  color: var(--gold);
+}
+
+.start-btn {
+  padding: 8px 4px;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(16px, 5vw, 24px);
+  text-shadow: var(--px) var(--px) 0 var(--accent);
+  cursor: pointer;
+  animation: blink 1s steps(1) infinite;
+}
+
+.start-btn:focus-visible {
+  outline: var(--px) solid var(--accent-2);
+  outline-offset: 8px;
+}
+
+.start-hint {
+  margin: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: var(--muted);
+}
+
+.start-screen.leaving {
+  animation: blink-out 0.45s steps(1) forwards;
+}
+
+@keyframes blink-out {
+  0%, 40%, 80% { opacity: 1; }
+  20%, 60%, 100% { opacity: 0; }
+}
+
+/* スタートまで 中身は かくして おく */
+.title,
+.subtitle,
+.npc,
+.floor,
+.footer,
+.bgm-toggle {
+  opacity: 0;
+}
+
+.booted .title {
+  animation: drop-in 0.5s steps(4) both;
+}
+
+.booted .subtitle,
+.booted .npc,
+.booted .footer,
+.booted .bgm-toggle {
+  animation: fade-in 0.3s steps(3) 0.5s both;
+}
+
+.booted .floor {
+  animation: fade-in 0.3s steps(3) 0.7s both;
+}
+
+@keyframes drop-in {
+  from { opacity: 0; translate: 0 -32px; }
+  to { opacity: 1; translate: 0 0; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- BGM ---------- */
+.bgm-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  padding: 8px 10px;
+  border: 0;
+  background: var(--btn);
+  color: var(--fg);
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--px) * -0.5) 0 0 var(--fg),
+    0 calc(var(--px) * 0.5) 0 0 var(--fg),
+    calc(var(--px) * -0.5) 0 0 0 var(--fg),
+    calc(var(--px) * 0.5) 0 0 0 var(--fg);
+}
+
+.bgm-toggle[aria-pressed="false"] {
+  color: var(--muted);
+}
+
+.bgm-toggle:hover,
+.bgm-toggle:focus-visible {
+  background: var(--btn-hover);
+  outline: none;
+}
+
+/* ---------- 受付の ピクセ ---------- */
+.npc {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.npc-sprite {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.npc-sprite:focus-visible {
+  outline: var(--px) solid var(--accent-2);
+  outline-offset: 4px;
+}
+
+.npc-sprite.jump {
+  animation: jump 0.3s steps(3);
+}
+
+.npc-body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: bob 1s steps(1) infinite;
+}
+
+.npc-body svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes bob {
+  50% { translate: 0 calc(var(--px) * -1); }
+}
+
+@keyframes jump {
+  50% { translate: 0 -16px; }
+}
+
+/* RPG の メッセージウィンドウ */
+.dialog {
+  position: relative;
+  flex: 1;
+  min-height: 80px;
+  padding: 12px 14px 18px;
+  background: var(--bg);
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--fg),
+    0 var(--px) 0 0 var(--fg),
+    calc(var(--px) * -1) 0 0 0 var(--fg),
+    var(--px) 0 0 0 var(--fg);
+}
+
+.dialog-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.dialog-next {
+  position: absolute;
+  right: 10px;
+  bottom: 4px;
+  font-size: 10px;
+  color: var(--accent);
+  visibility: hidden;
+}
+
+.dialog.more .dialog-next {
+  visibility: visible;
+  animation: blink 0.6s steps(1) infinite;
+}
+
+/* ---------- 台の ならび ---------- */
+.floor {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 16px;
+}
+
+.cab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 12px;
+  border: 0;
+  background: var(--btn);
+  color: var(--fg);
+  font-family: "Press Start 2P", "DotGothic16", monospace;
+  cursor: pointer;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--fg),
+    0 var(--px) 0 0 var(--fg),
+    calc(var(--px) * -1) 0 0 0 var(--fg),
+    var(--px) 0 0 0 var(--fg),
+    calc(var(--px) * 2) calc(var(--px) * 2) 0 0 var(--shadow);
+}
+
+.cab:hover,
+.cab:focus-visible {
+  background: var(--btn-hover);
+  outline: none;
+}
+
+.cab:focus-visible {
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--accent-2),
+    0 var(--px) 0 0 var(--accent-2),
+    calc(var(--px) * -1) 0 0 0 var(--accent-2),
+    var(--px) 0 0 0 var(--accent-2),
+    calc(var(--px) * 2) calc(var(--px) * 2) 0 0 var(--shadow);
+}
+
+.cab:active {
+  transform: translate(var(--px), var(--px));
+}
+
+/* 台の 上の 看板 */
+.cab-marquee {
+  width: 100%;
+  padding: 6px 2px;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 8px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* 台の 画面：インベーダーが 2 コマで うごく */
+.cab-screen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 var(--px) var(--shadow);
+}
+
+.cab-screen svg {
+  display: block;
+  width: 40%;
+  height: auto;
+}
+
+.cab-frame {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.cab-frame.a {
+  animation: frame-a 0.8s steps(1) infinite;
+}
+
+.cab-frame.b {
+  animation: frame-b 0.8s steps(1) infinite;
+}
+
+@keyframes frame-a {
+  50% { visibility: hidden; }
+}
+
+@keyframes frame-b {
+  0% { visibility: hidden; }
+  50% { visibility: visible; }
+}
+
+.cab-panel {
+  width: 70%;
+}
+
+.cab-panel svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.cab-hi {
+  font-size: 7px;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* まだ ない 台：布を かぶせる */
+.cab.soon {
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.cab.soon .cab-marquee {
+  background: var(--btn);
+  color: var(--fg);
+}
+
+.cab.soon .cab-screen {
+  background: repeating-linear-gradient(135deg, var(--btn) 0 8px, var(--bg-grid) 8px 16px);
+}
+
+.cab.soon .cab-screen svg {
+  width: 20%;
+}
+
+.cab.soon .cab-panel {
+  opacity: 0.4;
+}
+
+.cab.soon .cab-hi {
+  font-family: "DotGothic16", monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ---------- 下の ところ ---------- */
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.door {
+  color: var(--accent-2);
+  font-size: 14px;
+  text-align: center;
+  text-underline-offset: 3px;
+}
+
+.door:hover,
+.door:focus-visible {
+  color: var(--fg);
+}
+
+.about-btn {
+  padding: 6px 4px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-family: "DotGothic16", monospace;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.about-btn:hover,
+.about-btn:focus-visible {
+  color: var(--fg);
+}
+
+.copyright {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- ゲームの 画面 ---------- */
+.game {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(15, 11, 30, 0.96);
+}
+
+.game[hidden] {
+  display: none;
+}
+
+.game-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  color: var(--accent);
+}
+
+.game-close {
+  padding: 6px 8px;
+  border: 0;
+  background: var(--btn);
+  color: var(--fg);
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  cursor: pointer;
+}
+
+.game-canvas {
+  display: block;
+  image-rendering: pixelated;
+  touch-action: none;
+  outline: none;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--fg),
+    0 var(--px) 0 0 var(--fg),
+    calc(var(--px) * -1) 0 0 0 var(--fg),
+    var(--px) 0 0 0 var(--fg);
+}
+
+.game-help {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.gaming {
+  overflow: hidden;
+}
+
+/* ---------- このページについて ---------- */
+.about {
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  padding: 0;
+  border: 0;
+  background: var(--bg);
+  color: var(--fg);
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--accent-2),
+    0 var(--px) 0 0 var(--accent-2),
+    calc(var(--px) * -1) 0 0 0 var(--accent-2),
+    var(--px) 0 0 0 var(--accent-2);
+}
+
+.about::backdrop {
+  background: rgba(15, 11, 30, 0.75);
+}
+
+.about-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--btn);
+}
+
+.about-top h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: normal;
+  color: var(--accent-2);
+}
+
+.about-close {
+  padding: 2px 8px;
+  border: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Press Start 2P", monospace;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.about-body {
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  padding: 8px 20px 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  scrollbar-color: var(--muted) var(--bg);
+}
+
+.about-body h3 {
+  margin: 18px 0 4px;
+  font-size: 15px;
+  font-weight: normal;
+  color: var(--gold);
+}
+
+.about-body p,
+.about-body ul {
+  margin: 0;
+}
+
+.about-body ul {
+  padding-left: 1.2em;
+}
+
+.about-body a {
+  color: var(--accent-2);
+}
+
+.about-note {
+  margin-top: 6px !important;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.about-credit {
+  margin-top: 20px !important;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* スマホで 連打しても ダブルタップで 拡大に ならない ように */
+button,
+a,
+.dialog {
+  touch-action: manipulation;
+}
+
+.npc-sprite,
+.cab {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .cab-frame.b {
+    visibility: hidden;
+  }
+}

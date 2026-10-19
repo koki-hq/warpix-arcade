@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <!-- アプリの アイコン（icons/icon-*.png・apple-touch-icon.png）の 元。?s=512 の ように 大きさを わたす（v0.1）。
+       48×48 マスの ドット絵：インベーダーが うつる 台と、となりに たつ ピクセ -->
+  <title>WARPIX-ARCADE icon</title>
+  <style>
+    html, body { margin: 0; background: #0f0b1e; overflow: hidden; }
+    canvas { display: block; image-rendering: pixelated; }
+  </style>
+</head>
+<body>
+  <canvas id="c" width="48" height="48"></canvas>
+  <script>
+    const S = Number(new URLSearchParams(location.search).get("s") || 512);
+    const cv = document.getElementById("c");
+    cv.style.width = cv.style.height = `${S}px`;
+    const g = cv.getContext("2d");
+    const C = { bg: "#0f0b1e", grid: "#1a1433", o: "#000", w: "#f4f4f4", p: "#ff4fa3", c: "#3ee8ff", b: "#2a2150", v: "#8a80b8", y: "#ffd84a" };
+    const rect = (col, x, y, w, h) => { g.fillStyle = C[col]; g.fillRect(x, y, w, h); };
+    const art = (rows, x0, y0, k = 1) => rows.forEach((r, y) => [...r].forEach((ch, x) => C[ch] && ch !== "." && rect(ch, x0 + x * k, y0 + y * k, k, k)));
+
+    rect("bg", 0, 0, 48, 48);
+    for (let i = 0; i < 48; i += 8) { rect("grid", i, 0, 1, 48); rect("grid", 0, i, 48, 1); }
+    // 台（白い ふち・看板・画面・レバー）
+    rect("w", 4, 4, 23, 41);
+    rect("b", 5, 5, 21, 39);
+    rect("p", 5, 5, 21, 6);
+    rect("y", 8, 7, 2, 2); rect("y", 13, 7, 5, 2); rect("y", 21, 7, 2, 2);
+    rect("o", 6, 12, 19, 15);
+    rect("bg", 7, 13, 17, 13);
+    art(["..cccc..", ".cccccc.", "wwwwwwww", "wpwwwwpw", ".wwwwww.", ".w....w."], 8, 14, 2);
+    rect("v", 5, 29, 21, 4);
+    rect("w", 9, 29, 2, 3); rect("p", 8, 27, 4, 2);
+    rect("c", 17, 30, 2, 2); rect("p", 21, 30, 2, 2);
+    rect("o", 5, 34, 21, 1);
+    // ピクセ（16×16）
+    art([
+      ".......pp.......",
+      ".......ww.......",
+      ".......ww.......",
+      ".....oooooo.....",
+      "...oowwwwwwoo...",
+      "..owwwwwwwwwwo..",
+      ".owwwwwwwwwwwwo.",
+      ".owwcowwwwcowwo.",
+      ".owwoowwwwoowwo.",
+      ".owppwwwwwwppwo.",
+      ".owwwwwoowwwwwo.",
+      ".owwwwwwwwwwwwo.",
+      "..owwwwwwwwwwo..",
+      "...oowwwwwwoo...",
+      "....oo....oo....",
+      "................",
+    ], 28, 29);
+  </script>
+</body>
+</html>

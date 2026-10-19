@@ -1,0 +1,72 @@
+// ---------- サービスワーカー：オフラインでも あそべる ように（warpix-link と おなじ しくみ） ----------
+// 公開するたびに VERSION を上げると、新しいファイルを取り直す
+const VERSION = "arcade-v0.1.0";
+const FONT_CACHE = "arcade-fonts";
+const FILES = [
+  "./",
+  "index.html",
+  "style.css",
+  "fonts/dotgothic16.woff2",
+  "core.js",
+  "invaders.js",
+  "hall.js",
+  "manifest.webmanifest",
+  "icons/icon-192.png",
+  "icons/icon-512.png",
+  "icons/apple-touch-icon.png",
+];
+
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches
+      .open(VERSION)
+      .then((c) => c.addAll(FILES.map((f) => new Request(f, { cache: "reload" }))))
+      .then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== VERSION && k !== FONT_CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (e) => {
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+
+  // 自分のファイル：キャッシュをすぐ返し、裏で新しいものに更新しておく
+  if (url.origin === location.origin && url.pathname.startsWith(new URL(self.registration.scope).pathname)) {
+    e.respondWith(
+      caches.open(VERSION).then(async (cache) => {
+        const hit = await cache.match(req, { ignoreSearch: true });
+        const fresh = fetch(req)
+          .then((res) => {
+            if (res.ok) cache.put(req, res.clone());
+            return res;
+          })
+          .catch(() => hit);
+        return hit || fresh;
+      })
+    );
+    return;
+  }
+
+  // Google Fonts：一度取ったらキャッシュから（オフラインでもドット文字のまま）
+  if (url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com") {
+    e.respondWith(
+      caches.open(FONT_CACHE).then(async (cache) => {
+        const hit = await cache.match(req);
+        if (hit) return hit;
+        const res = await fetch(req);
+        if (res.ok || res.type === "opaque") cache.put(req, res.clone());
+        return res;
+      })
+    );
+  }
+  // それ以外は ふつうに ネットへ
+});
