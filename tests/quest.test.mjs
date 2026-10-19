@@ -1,7 +1,7 @@
 // 2 だいめ PIXE QUEST：ピクセを そだてる。たたかいは「見て、よけて、なぐる」（v0.6）。来ない あいだも しゅぎょう
 const KEY = "warpix-arcade-quest";
 
-// ページの なかの ロボット：ボスの クセを 見て はんたいに よけ、すきが できたら パンチ（skill = 0 なら なにも しない）
+// ページの なかの ロボット：ボスの クセを 見て あたらない がわへ よけ、チャンスに パンチ（skill = 0 なら なにも しない）
 const BOT = (skill = 1) => `(() => {
   clearInterval(window.__qbot);
   let lastTell = null;
@@ -9,7 +9,7 @@ const BOT = (skill = 1) => `(() => {
     const b = quest.battle();
     if (!b || b.over || ${skill} === 0) return;
     const next = b.lands.find((l) => !l.done);
-    if (b.state === "tell" && next && next !== lastTell && next.at - quest.beatNow() < 0.4) {
+    if (b.state === "tell" && next && next !== lastTell) {
       lastTell = next;
       quest.act(next.side === "L" ? "right" : "left");
     }
@@ -38,7 +38,7 @@ export default {
     t.ok(await p.ev(`quest.isOpen() && !document.getElementById("quest").hidden && document.body.classList.contains("gaming")`), "ひらかない");
     const bosses = await p.ev(`[...document.querySelectorAll(".quest-boss")].map((b) => [b.dataset.boss, b.disabled, b.classList.contains("next")])`);
     t.eq(bosses, [["purun", false, true], ["obake", true, false], ["golem", true, false], ["hachi", true, false], ["doragon", true, false], ["maou", true, false]], "ボスの ならび");
-    t.ok((await p.ev(`document.querySelector(".quest-how").textContent`)).includes("はんたいに よける"), "あそびかたが ない");
+    t.ok((await p.ev(`document.querySelector(".quest-how").textContent`)).includes("赤く ひかったら"), "あそびかたが ない");
     t.ok(await p.ev(`document.activeElement.dataset.boss === "purun"`), "つぎの ボスに フォーカス");
     await p.shot("quest-home.png");
     await p.click('[data-boss="purun"]');
@@ -46,24 +46,27 @@ export default {
     t.eq(await p.ev(`quest.battle().state`), "intro", "3・2・1 から はじまらない");
     t.eq(await p.ev(`[...document.querySelectorAll("[data-cmd]")].map((b) => b.dataset.cmd)`), ["left", "punch", "right"], "ボタン");
     t.eq(await p.ev(`document.getElementById("quest-hearts").textContent`), "♥♥♥", "ハート");
-    // すきの ない ときの パンチは ガードされる
+    // すきの ない ときの パンチも すこし はいる（1）
     await t.sleep(3400);
     await p.ev(`quest.act("punch")`);
-    t.eq(await p.ev(`quest.battle().hp`), 12, "すきが ないのに パンチが はいった");
-    // クセが でるまで まって、はんたいに よける → すき → パンチ
+    t.eq(await p.ev(`quest.battle().hp`), 47, "ふつうの パンチが 1 はいらない");
+    t.ok(await p.ev(`document.getElementById("quest-ring").getContext("2d").imageSmoothingEnabled === false`), "ドットが ぼやける");
+    // クセが でたら、赤く ひかった ゆかから にげる → そこに いつづける → チャンス → 4 ばい
     for (let i = 0; i < 40 && (await p.ev(`quest.battle().state`)) !== "tell"; i++) await t.sleep(100);
     const side = await p.ev(`quest.battle().lands[0].side`);
+    t.eq(await p.ev(`quest.danger()`), side === "C" ? ["C"] : [side, "C"], "赤く ひかる ゆか");
     t.ok((await p.ev(`document.getElementById("quest-call").textContent`)).includes("ぷるぷる"), "クセの ひとことが ない");
     await p.shot("quest-tell.png");
-    // あたる 0.5 拍 まえまで まって よける（はやすぎると もどって しまう）
-    for (let i = 0; i < 60 && (await p.ev(`quest.battle().lands[0].at - quest.beatNow()`)) > 0.5; i++) await t.sleep(30);
     await p.key(side === "L" ? "ArrowRight" : "ArrowLeft");
-    for (let i = 0; i < 40 && (await p.ev(`quest.battle().state`)) === "tell"; i++) await t.sleep(50);
-    t.eq(await p.ev(`quest.battle().state`), "stun", `よけても すきが できない（${side} から）`);
+    await t.sleep(700);
+    t.eq(await p.ev(`quest.battle().lane`), side === "L" ? "R" : "L", "よけた ばしょに いつづけない");
+    for (let i = 0; i < 60 && (await p.ev(`quest.battle().state`)) === "tell"; i++) await t.sleep(50);
+    t.eq(await p.ev(`quest.battle().state`), "stun", `よけても チャンスに ならない（${side} から）`);
+    const hp0 = await p.ev(`quest.battle().hp`);
     await p.key(" ");
-    await t.sleep(250);
-    await p.key(" ");
-    t.ok((await p.ev(`quest.battle().hp`)) <= 10, "すきに パンチが はいらない");
+    t.eq(await p.ev(`quest.battle().hp`), hp0 - 4, "チャンスの パンチが 4 ばいに ならない");
+    t.eq(await p.ev(`quest.battle().lane`), "C", "パンチで まんなかに もどらない");
+    await t.sleep(100);
     await p.shot("quest-stun.png");
     // あとは ロボットに まかせて たおす
     await p.ev(BOT());
@@ -149,6 +152,22 @@ export default {
     t.ok((await p.ev(`quest.battle().log.join("/")`)).includes("ゴーレムが うけとめた"), "ゴーレムが うけとめない");
     t.eq(await p.ev(`quest.battle().hearts`), await p.ev(`quest.battle().maxHearts`), "うけとめたのに ハートが へった");
     await p.ev(`clearInterval(window.__qbot)`);
+    t.ok(await p.ev(`!!document.getElementById("quest-gauge")`), "セコンドが いるのに なかま ゲージが ない");
+    await p.key("Escape");
+    // 合体わざ：なかま ゲージが 満タンで チャンスに パンチ
+    await p.click('[data-cab="quest"]');
+    await t.sleep(200);
+    await p.click('[data-ally="hachi"]');
+    await p.click('[data-boss="doragon"]');
+    await t.sleep(200);
+    await p.ev(`quest.battle().gauge = 100`);
+    await p.ev(BOT());
+    for (let i = 0; i < 100 && !(await p.ev(`quest.battle().stats.combos`)); i++) await t.sleep(100);
+    t.ok((await p.ev(`quest.battle().log.join("/")`)).includes("がったい わざ！「ひとさし ラッシュ」"), "合体わざが でない");
+    t.eq(await p.ev(`quest.battle().gauge`), 0, "合体わざの あと ゲージが もどらない");
+    await t.sleep(300);
+    await p.shot("quest-combo.png");
+    await p.ev(`clearInterval(window.__qbot)`);
     await p.key("Escape");
     t.noErrors(p);
     await server.close();
@@ -215,7 +234,8 @@ export default {
     const l = await p.ev(`(() => { const r = document.querySelector('[data-cmd="left"]').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
     await p.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [l] });
     await p.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-    t.ok(await p.ev(`quest.battle().dodge?.dir === "L"`), "ゆびで よけられない");
+    t.eq(await p.ev(`quest.battle().lane`), "L", "ゆびで よけられない");
+    t.ok(await p.ev(`[...document.styleSheets].some((s) => { try { return [...s.cssRules].some((r) => r.selectorText === ".bgm-toggle" && r.cssText.includes("safe-area-inset-top")); } catch { return false; } })`), "BGM ボタンが 時計の 帯に かさなる");
     await p.shot("quest-phone-battle.png");
     t.noErrors(p);
     await server.close();
